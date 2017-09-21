@@ -14,8 +14,8 @@ A small bot for learning praw
         -l --level=<level>      [default: info]
 
     Be sure to export envars first:
-        export REDDIT_REDDIT_CLIENT_ID=''
-        export REDDIT_REDDIT_CLIENT_SECRET=''
-        export REDDIT_REDDIT_USERNAME=''
-        export REDDIT_REDDIT_PASSWORD=''
+        export REDDIT_CLIENT_ID=''
+        export REDDIT_CLIENT_SECRET=''
+        export REDDIT_USERNAME=''
+        export REDDIT_PASSWORD=''
 ```
