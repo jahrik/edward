@@ -1,5 +1,7 @@
 # Reddit bot
-A small bot for learning praw
+A small bot that utilizes praw and chatterbot
+* [PRAW](https://praw.readthedocs.io/en/latest/)
+* [ChatterBot](https://github.com/gunthercox/ChatterBot)
 
 ## Table of Contents
 
