@@ -95,9 +95,10 @@ def get_reddit():
     return reddit
 
 
-def chat_bot_learn_english():
+def english_training():
     ''' https://github.com/gunthercox/ChatterBot '''
 
+    LOG.info('Teaching bot basic english...')
     chatbot = ChatBot(
         'Useless Bot',
         storage_adapter='chatterbot.storage.SQLStorageAdapter',
@@ -123,8 +124,6 @@ def chat_bot_learn_english():
 def chat_bot():
     ''' https://github.com/gunthercox/ChatterBot '''
 
-    LOG.info('Teaching bot basic english...')
-    chatbot = chat_bot_learn_english()
     chatbot = ChatBot(
         'Useless Bot',
         storage_adapter='chatterbot.storage.SQLStorageAdapter',
@@ -239,7 +238,9 @@ def main():
     if '--training' in argument and argument.get('--training'):
         training = argument.get('--training')
 
-    if training == 'training':
+    if training == 'english':
+        english_training()
+    elif training == 'training':
         bot_training()
     elif training == 'reddit':
         reddit_mode()
