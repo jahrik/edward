@@ -1,6 +1,12 @@
 # Reddit bot
 A small bot for learning praw
 
+## Table of Contents
+
+  * [Usage:](#usage)
+     * [Training mode](#training-mode)
+     * [Reddit mode](#reddit-mode)
+
 ## Usage: 
 ```
 ./bot.py -h
