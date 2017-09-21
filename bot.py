@@ -4,12 +4,12 @@
 
     Usage:
         bot.py [-l <level> | --level <level>]
-               [-t <training> | --training <training>]
+               [-t <type> | --training <type>]
 
     Options:
         -h --help               Show this screen
         -l --level=<level>      [default: info]
-        -t --training=<training>    Training level [default: training]
+        -t --training=<type>    Training level [default: manual]
 
     Be sure to export envars first:
         export REDDIT_CLIENT_ID=''
@@ -95,6 +95,17 @@ def get_reddit():
     return reddit
 
 
+def get_sub_comments(comment):
+    ''' get sub comments from a reddit comment object as a list '''
+
+    sub_comments = []
+    sub_comments.append(comment.body)
+    for _idx, child in enumerate(comment.replies):
+        sub_comments.append(child.body)
+
+    return sub_comments
+
+
 def english_training():
     ''' https://github.com/gunthercox/ChatterBot '''
 
@@ -144,7 +155,7 @@ def chat_bot():
     return chatbot
 
 
-def reddit_mode():
+def reddit_training():
     ''' Grab the first comment from a reddit subreddit to train the bot '''
 
     chatbot = chat_bot()
@@ -152,7 +163,7 @@ def reddit_mode():
     # reddit.read_only = True
     LOG.info('Read only?: %s', reddit.read_only)
 
-    lim = 10
+    lim = 1
     sub = 'all'
     # sub = 'food'
     # sub = 'SubredditSimulator'
@@ -174,17 +185,15 @@ def reddit_mode():
             # Comments
             submission.comments.replace_more(limit=0)
             comments_list = submission.comments.list()
-            training_list = [(comment.body) for comment in comments_list]
-            comment = training_list[0]
 
-            # Train the chat bot with a few responses
-            chatbot.train(training_list)
+            for comment in comments_list:
 
-            # Get a response to an input statement
-            response = chatbot.get_response(comment)
-            LOG.info('Comment: %s', comment)
-            LOG.info('Response: %s', response)
-            LOG.info('------------------------------------------------------------')
+                sub_comments = get_sub_comments(comment)
+
+                LOG.info('Training: %s', sub_comments)
+                chatbot.train(sub_comments)
+
+            LOG.info('--------------------------------------------------------')
 
         except praw.exceptions.APIException as praw_exc:
             LOG.error('APIException: %s', praw_exc)
@@ -202,7 +211,7 @@ def reddit_mode():
                 sleep(60)
 
 
-def bot_training():
+def manual_training():
     ''' talk to your bot!
         train your bot!
     '''
@@ -240,10 +249,10 @@ def main():
 
     if training == 'english':
         english_training()
-    elif training == 'training':
-        bot_training()
+    elif training == 'manual':
+        manual_training()
     elif training == 'reddit':
-        reddit_mode()
+        reddit_training()
     else:
         LOG.error('Unknown training mode')
 
