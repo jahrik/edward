@@ -10,18 +10,20 @@
         -l --level=<level>      [default: info]
 
     Be sure to export envars first:
-        export REDDIT_REDDIT_CLIENT_ID=''
-        export REDDIT_REDDIT_CLIENT_SECRET=''
-        export REDDIT_REDDIT_USERNAME=''
-        export REDDIT_REDDIT_PASSWORD=''
+        export REDDIT_CLIENT_ID=''
+        export REDDIT_CLIENT_SECRET=''
+        export REDDIT_USERNAME=''
+        export REDDIT_PASSWORD=''
 
 """
 import os
 import sys
 import logging
 from logging import StreamHandler
+from time import sleep
 from docopt import docopt
 import praw
+# import requests
 
 
 def logging_setup():
@@ -39,7 +41,7 @@ def logging_setup():
                         datefmt="%Y-%m-%d %H:%M:%S",
                         handlers=handlers)
 
-    logger = logging.getLogger('bot')
+    logger = logging.getLogger('prawcore')
 
     return logger
 
@@ -74,8 +76,8 @@ def get_envars():
     return client_id, client_secret, username, password
 
 
-def main():
-    ''' main '''
+def get_reddit():
+    ''' Get praw.Reddit '''
 
     client_id, client_secret, username, password = get_envars()
     LOG.debug('%s', client_id)
@@ -88,11 +90,48 @@ def main():
                          user_agent='uselessbots:v0.0.1 (by /u/uselessbots)',
                          username=username,
                          password=password)
+    return reddit
 
-    LOG.info('Read only?: %s', reddit.read_only)  # Output: True
 
-    for submission in reddit.subreddit('botwatch').hot(limit=10):
-        LOG.info(submission.title)
+def main():
+    ''' main '''
+
+    reddit = get_reddit()
+
+    LOG.info('Read only?: %s', reddit.read_only)
+    # reddit.read_only = True
+
+    for submission in reddit.subreddit('SubredditSimulator').hot(limit=10):
+
+        # exceeding rate limits
+        sleep(2)
+
+        try:
+            LOG.info('Title: %s', submission.title)
+            LOG.info('Score: %s', submission.score)
+            LOG.info('ID: %s', submission.id)
+            LOG.info('URL: %s', submission.url)
+            # if submission.author:
+            LOG.info('Author: %s', submission.author)
+            LOG.info('Link karma: %s', submission.author.link_karma)
+            # LOG.info('Top comments: %s', list(submission.comments))
+            # LOG.info('All comments: %s', submission.comments.list())
+            LOG.info('------------------------------------------------------------')
+
+        except praw.exceptions.APIException as praw_exc:
+            LOG.error('APIException: %s', praw_exc)
+
+        except praw.exceptions.ClientException as praw_exc:
+            LOG.error('ClientException: %s', praw_exc)
+
+        except praw.exceptions.PRAWException as praw_exc:
+            LOG.error('PRAWException: %s', praw_exc)
+
+        except AssertionError as exc:
+            if '429' in '%s' % exc:
+                LOG.warning('Exceeding rate limits: %s', exc)
+                LOG.warning('sleeping for 60 seconds')
+                sleep(60)
 
 
 if __name__ == '__main__':
