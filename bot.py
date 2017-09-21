@@ -158,7 +158,7 @@ def reddit_mode():
     # sub = 'SubredditSimulator'
     slp = 3
 
-    for submission in reddit.subreddit(sub).top(limit=lim):
+    for submission in reddit.subreddit(sub).hot(limit=lim):
 
         # easily exceeding rate limits, so we'll sleep
         sleep(slp)
