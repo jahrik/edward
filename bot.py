@@ -4,10 +4,12 @@
 
     Usage:
         bot.py [-l <level> | --level <level>]
+               [-t <training> | --training <training>]
 
     Options:
         -h --help               Show this screen
         -l --level=<level>      [default: info]
+        -t --training=<training>    Training level [default: training]
 
     Be sure to export envars first:
         export REDDIT_CLIENT_ID=''
@@ -23,7 +25,7 @@ from logging import StreamHandler
 from time import sleep
 from docopt import docopt
 import praw
-# import requests
+from chatterbot import ChatBot
 
 
 def logging_setup():
@@ -93,29 +95,96 @@ def get_reddit():
     return reddit
 
 
-def main():
-    ''' main '''
+def chat_bot_learn_english():
+    ''' https://github.com/gunthercox/ChatterBot '''
 
+    chatbot = ChatBot(
+        'Useless Bot',
+        storage_adapter='chatterbot.storage.SQLStorageAdapter',
+        database='./bot_db.sqlite3',
+        logic_adapters=[
+            {
+                'import_path': 'chatterbot.logic.BestMatch'
+            },
+            {
+                'import_path': 'chatterbot.logic.LowConfidenceAdapter',
+                'threshold': 0.65,
+                'default_response': 'I am sorry, but I do not understand.'
+            }
+        ],
+        trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
+    )
+
+    chatbot.train("chatterbot.corpus.english")
+
+    return chatbot
+
+
+def chat_bot():
+    ''' https://github.com/gunthercox/ChatterBot '''
+
+    LOG.info('Teaching bot basic english...')
+    chatbot = chat_bot_learn_english()
+    chatbot = ChatBot(
+        'Useless Bot',
+        storage_adapter='chatterbot.storage.SQLStorageAdapter',
+        database='./bot_db.sqlite3',
+        logic_adapters=[
+            {
+                'import_path': 'chatterbot.logic.BestMatch'
+            },
+            {
+                'import_path': 'chatterbot.logic.LowConfidenceAdapter',
+                'threshold': 0.25,
+                'default_response': 'I am sorry, but I do not understand.'
+            }
+        ],
+        trainer='chatterbot.trainers.ListTrainer'
+    )
+
+    return chatbot
+
+
+def reddit_mode():
+    ''' Grab the first comment from a reddit subreddit to train the bot '''
+
+    chatbot = chat_bot()
     reddit = get_reddit()
-
-    LOG.info('Read only?: %s', reddit.read_only)
     # reddit.read_only = True
+    LOG.info('Read only?: %s', reddit.read_only)
 
-    for submission in reddit.subreddit('SubredditSimulator').hot(limit=10):
+    lim = 10
+    sub = 'all'
+    # sub = 'food'
+    # sub = 'SubredditSimulator'
+    slp = 3
 
-        # exceeding rate limits
-        sleep(2)
+    for submission in reddit.subreddit(sub).top(limit=lim):
+
+        # easily exceeding rate limits, so we'll sleep
+        sleep(slp)
 
         try:
             LOG.info('Title: %s', submission.title)
             LOG.info('Score: %s', submission.score)
             LOG.info('ID: %s', submission.id)
             LOG.info('URL: %s', submission.url)
-            # if submission.author:
             LOG.info('Author: %s', submission.author)
             LOG.info('Link karma: %s', submission.author.link_karma)
-            # LOG.info('Top comments: %s', list(submission.comments))
-            # LOG.info('All comments: %s', submission.comments.list())
+
+            # Comments
+            submission.comments.replace_more(limit=0)
+            comments_list = submission.comments.list()
+            training_list = [(comment.body) for comment in comments_list]
+            comment = training_list[0]
+
+            # Train the chat bot with a few responses
+            chatbot.train(training_list)
+
+            # Get a response to an input statement
+            response = chatbot.get_response(comment)
+            LOG.info('Comment: %s', comment)
+            LOG.info('Response: %s', response)
             LOG.info('------------------------------------------------------------')
 
         except praw.exceptions.APIException as praw_exc:
@@ -132,6 +201,50 @@ def main():
                 LOG.warning('Exceeding rate limits: %s', exc)
                 LOG.warning('sleeping for 60 seconds')
                 sleep(60)
+
+
+def bot_training():
+    ''' talk to your bot!
+        train your bot!
+    '''
+
+    chatbot = chat_bot()
+    response = 'How can I help you?'
+
+    while True:
+
+        try:
+            training = []
+            response = '%s: ' % response
+            comment = input(response)
+            training.append(str(response))
+            training.append(str(comment))
+            response = chatbot.get_response(comment)
+            LOG.info('Comment: %s', comment)
+            LOG.info('Response: %s', response)
+            LOG.info('Training bot: %s', training)
+            chatbot.train(training)
+
+        except (KeyboardInterrupt, EOFError, SystemExit):
+            break
+
+    return
+
+
+def main():
+    ''' main '''
+
+    argument = docopt(__doc__, version='1.0.0')
+
+    if '--training' in argument and argument.get('--training'):
+        training = argument.get('--training')
+
+    if training == 'training':
+        bot_training()
+    elif training == 'reddit':
+        reddit_mode()
+    else:
+        LOG.error('Unknown training mode')
 
 
 if __name__ == '__main__':
