@@ -23,24 +23,37 @@ A small bot for learning praw
 ```
 
 ### Training mode
+* train your bot!
+* raw input mode
+* bot will ask you how it can help?
+* and carry on a conversation from there
+* will take your response and learn from it
 ```
-./bot.py -t training
-How can I help you? hello bot
-2017-09-21 03:55:01.091 INFO input_adapter - process_input_statement: Recieved input statement: hello bot
-2017-09-21 03:55:01.098 INFO input_adapter - process_input_statement: "hello bot" is not a known statement
-2017-09-21 03:55:23.150 INFO best_match - process: Using "hello bot" as a close match to "hello"
-2017-09-21 03:55:23.155 INFO best_match - process: Selecting response from 1 optimal responses.
-2017-09-21 03:55:23.155 INFO response_selection - get_first_response: Selecting first response from list of 1 options.
-2017-09-21 03:55:23.156 INFO best_match - process: Response selected. Using "howdy"
-2017-09-21 03:55:23.156 INFO multi_adapter - process: BestMatch selected "howdy" as a response with a confidence of 0.71
-2017-09-21 03:55:44.310 INFO multi_adapter - process: LowConfidenceAdapter selected "I am sorry, but I do not understand." as a response with a confidence of 0
-2017-09-21 03:55:44.313 INFO multi_adapter - process: NoKnowledgeAdapter selected "hello bot" as a response with a confidence of 0
-2017-09-21 03:55:44.327 INFO bot - bot_training: Comment: hello bot
-2017-09-21 03:55:44.327 INFO bot - bot_training: Response: howdy
-How can I help you?
+How can I help you?: hello
+...
+2017-09-21 05:13:45.822 INFO bot - bot_training: Comment: hello
+2017-09-21 05:13:45.823 INFO bot - bot_training: Response: hello
+2017-09-21 05:13:45.823 INFO bot - bot_training: Training bot: ['How can I help you?: ', 'hello']
+List Trainer: [####################] 100%
+hello: Good day!
+...
+2017-09-21 05:14:00.166 INFO bot - bot_training: Comment: Good day!
+2017-09-21 05:14:00.166 INFO bot - bot_training: Response: ok :) :)
+2017-09-21 05:14:00.166 INFO bot - bot_training: Training bot: ['hello: ', 'Good day!']
+List Trainer: [####################] 100%
+ok :) :): What are you?
+...
+2017-09-21 05:14:17.346 INFO bot - bot_training: Comment: What are you?
+2017-09-21 05:14:17.346 INFO bot - bot_training: Response: Who? Who is but a form following the function of what
+2017-09-21 05:14:17.346 INFO bot - bot_training: Training bot: ['ok :) :): ', 'What are you?']
+List Trainer: [####################] 100%
+Who? Who is but a form following the function of what:
+...
 ```
 
 ### Reddit mode
-```
-
-```
+* Specify a subreddit
+* Specify limit
+* bot will gather entire comment chain from limit of top posts
+* bot will train with comment chain
+* bot will respond to first comment
