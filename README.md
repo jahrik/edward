@@ -1,4 +1,6 @@
 # Reddit bot
+
+[![Join the chat at https://gitter.im/jahrik/reddit_bot](https://badges.gitter.im/jahrik/reddit_bot.svg)](https://gitter.im/jahrik/reddit_bot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A small bot that utilizes praw and chatterbot
 * [PRAW](https://praw.readthedocs.io/en/latest/)
 * [ChatterBot](https://github.com/gunthercox/ChatterBot)
