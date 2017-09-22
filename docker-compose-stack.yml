@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+
+  bot:
+    image: bot:latest
+    environment:
+      # - DB=mongo
+      - FOO=BAR
+    networks:
+      - default
+
+  mongo:
+    image: mongo
+    networks:
+      - default
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+        - 27017:27017
+    command: mongod --smallfiles --logpath=/dev/null # --quiet
+
+networks:
+  default:
+    external: false
