@@ -3,7 +3,6 @@ version: '3'
 services:
   bot:
     image: bot:latest
-    container_name: "bot"
     environment:
       - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
       - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}
@@ -18,14 +17,11 @@ services:
       - HIPCHAT_ACCESS_TOKEN=${HIPCHAT_ACCESS_TOKEN}
       - GITTER_ROOM=${GITTER_ROOM}
       - GITTER_API_TOKEN=${GITTER_API_TOKEN}
-    links:
-      - mongo
     depends_on:
       - mongo
 
   mongo:
     image: mongo:latest
-    container_name: "mongo"
     environment:
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/dev/null
