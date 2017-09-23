@@ -1,2 +1,2 @@
-0 * * * * python3 /src/bot.py -t reddit
-*/10 * * * * python3 /src/bot.py -t twitter
+0 * * * * python3 /src/edward.py -t reddit
+*/10 * * * * python3 /src/edward.py -t twitter
