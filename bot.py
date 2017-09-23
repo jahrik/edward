@@ -347,7 +347,6 @@ def manual_training():
     bot = chat_bot()
     response = 'How can I help you?'
 
-    print(bot.default_session)
     while True:
 
         try:
