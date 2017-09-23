@@ -28,7 +28,7 @@ services:
     container_name: "mongo"
     environment:
       - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
+      # - MONGO_LOG_DIR=/dev/null
     volumes:
       - ./data/db:/data/db
     ports:
