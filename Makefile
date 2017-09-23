@@ -9,17 +9,24 @@ test: build
 	@docker-compose down
 	@docker-compose up -d
 
+deploy: build
+	@docker stack deploy -c docker-compose-stack.yml edward
+
+destroy:
+	@docker stack rm edward
+	@docker-compose down
+
 n ?= 10
 train:
-	python bot.py -t english
-	python bot.py -t reddit
+	python edward.py -t english
+	python edward.py -t reddit
 	n=$(n); \
 	while [ $${n} -gt 0 ] ; do \
 			echo $$n ; \
-			python bot.py -t twitter; \
+			python edward.py -t twitter; \
 			sleep 60; \
 			n=`expr $$n - 1`; \
 	done; \
 	true
 
-.PHONY: all build test
+.PHONY: all build test deploy destroy train
