@@ -170,11 +170,20 @@ def get_reddit():
     LOG.debug('%s', username)
     LOG.debug('%s', password)
 
-    reddit = praw.Reddit(client_id=client_id,
-                         client_secret=client_secret,
-                         user_agent='uselessbots:v0.0.1 (by /u/uselessbots)',
-                         username=username,
-                         password=password)
+    try:
+
+        reddit = praw.Reddit(client_id=client_id,
+                             client_secret=client_secret,
+                             user_agent='uselessbots:v0.0.1 (by /u/uselessbots)',
+                             username=username,
+                             password=password)
+    
+    except AssertionError as exc:
+        if '429' in '%s' % exc:
+            LOG.warning('Exceeding rate limits: %s', exc)
+            LOG.warning('sleeping for 10 seconds')
+            sleep(10)
+
     return reddit
 
 
