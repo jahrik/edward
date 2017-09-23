@@ -1,13 +1,15 @@
-# Reddit bot
-A small bot that utilizes praw and chatterbot
+# Edward
+
+[![Join the chat at https://gitter.im/jahrik/edward](https://badges.gitter.im/jahrik/edward.svg)](https://gitter.im/jahrik/edward?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+* A small bot that utilizes praw and chatterbot to connect to multiple services
 * [PRAW](https://praw.readthedocs.io/en/latest/)
 * [ChatterBot](https://github.com/gunthercox/ChatterBot)
-
-## Table of Contents
-
-  * [Usage:](#usage)
-     * [Training mode](#training-mode)
-     * [Reddit mode](#reddit-mode)
+* train with:
+  * reddit
+  * twitter
+  * gitter
+  * hipchat
+  * manual feedback
 
 ## Usage: 
 ```
