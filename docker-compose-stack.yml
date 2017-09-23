@@ -1,28 +1,36 @@
 version: '3'
 
 services:
-
   bot:
     image: bot:latest
+    container_name: "bot"
     environment:
-      # - DB=mongo
-      - FOO=BAR
-    networks:
-      - default
+      - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
+      - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}
+      - REDDIT_USERNAME=${REDDIT_USERNAME}
+      - REDDIT_PASSWORD=${REDDIT_PASSWORD}
+      - TWITTER_KEY=${TWITTER_KEY}
+      - TWITTER_SECRET=${TWITTER_SECRET}
+      - TWITTER_TOKEN=${TWITTER_TOKEN}
+      - TWITTER_TOKEN_SECRET=${TWITTER_TOKEN_SECRET}
+      - HIPCHAT_HOST=${HIPCHAT_HOST}
+      - HIPCHAT_ROOM=${HIPCHAT_ROOM}
+      - HIPCHAT_ACCESS_TOKEN=${HIPCHAT_ACCESS_TOKEN}
+      - GITTER_ROOM=${GITTER_ROOM}
+      - GITTER_API_TOKEN=${GITTER_API_TOKEN}
+    links:
+      - mongo
+    depends_on:
+      - mongo
 
   mongo:
-    image: mongo
-    networks:
-      - default
+    image: mongo:latest
+    container_name: "mongo"
     environment:
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/dev/null
     volumes:
       - ./data/db:/data/db
     ports:
-        - 27017:27017
-    command: mongod --smallfiles --logpath=/dev/null # --quiet
-
-networks:
-  default:
-    external: false
+      - 27017:27017
+    command: mongod
