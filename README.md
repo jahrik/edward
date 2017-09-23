@@ -2,12 +2,17 @@
 * A small bot that utilizes praw and chatterbot to connect to multiple services
 * [PRAW](https://praw.readthedocs.io/en/latest/)
 * [ChatterBot](https://github.com/gunthercox/ChatterBot)
-* train with:
-  * reddit
-  * twitter
-  * gitter
-  * hipchat
-  * manual feedback
+
+## Table of Contents
+
+  * [Usage:](#usage)
+  * [Training:](#training)
+     * [Manual](#manual)
+     * [Reddit](#reddit)
+     * [Twitter](#twitter)
+  * [Bots:](#training)
+     * [Gitter](#gitter)
+     * [Hipchat](#hipchat)
 
 ## Usage: 
 ```
@@ -40,6 +45,8 @@
         export GITTER_API_TOKEN=
 
 ```
+
+## Training
 
 ### Manual
 * train bot
@@ -108,8 +115,13 @@ root@8d298baf24d5:/src# ./edward.py -t twitter
 2017-09-23 08:04:00.921 INFO edward - twitter_training: Trained database generated successfully!
 ```
 
+## Bots
+
 ### Gitter
 
 * bot defaults to listening to gitter room
 * [https://gitter.im/jahrik/edward](https://gitter.im/jahrik/edward)
 * does not respond yet
+
+
+### Hipchat
