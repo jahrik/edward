@@ -13,6 +13,7 @@
   * [Bots:](#training)
      * [Gitter](#gitter)
      * [Hipchat](#hipchat)
+  * [TODO:](#todo)
 
 ## Usage: 
 ```
@@ -125,3 +126,15 @@ root@8d298baf24d5:/src# ./edward.py -t twitter
 
 
 ### Hipchat
+
+
+## TODO:
+* connect to https://www.eviebot.com/en/
+* connect to http://www.cleverbot.com/
+* connect to facebook
+* connect to facebook messenger
+* fix hipchat bot
+* fix gitter bot
+* voice recognition from microphone
+* apple app
+* android app
