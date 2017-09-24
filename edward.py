@@ -10,7 +10,7 @@
     Options:
         -h --help               Show this screen
         -l --level=<level>      [default: info]
-        -t --training=<type>    Training level [default: manual]
+        -t --training=<type>    Training level [default: feedback]
 
     Be sure to export envars first:
         export REDDIT_CLIENT_ID=
@@ -32,12 +32,16 @@
 import os
 import sys
 import logging
+import random
 from logging import StreamHandler
 from time import sleep
+import multiprocessing
 from docopt import docopt
 import praw
 from chatterbot import ChatBot
 from chatterbot.utils import input_function
+from chatterbot.trainers import ChatterBotCorpusTrainer
+from chatterbot.trainers import UbuntuCorpusTrainer
 
 
 def logging_setup():
@@ -177,7 +181,7 @@ def get_reddit():
                              user_agent='uselessbots:v0.0.1 (by /u/uselessbots)',
                              username=username,
                              password=password)
-    
+
     except AssertionError as exc:
         if '429' in '%s' % exc:
             LOG.warning('Exceeding rate limits: %s', exc)
@@ -202,14 +206,14 @@ def chat_bot():
     ''' https://github.com/gunthercox/ChatterBot '''
 
     chatbot = ChatBot(
-        'Useless Bot',
+        'Default Bot',
         storage_adapter='chatterbot.storage.MongoDatabaseAdapter',
         database='bot_db',
         database_uri='mongodb://mongo:27017/',
         logic_adapters=[
             {
                 'import_path': 'chatterbot.logic.BestMatch'
-            },
+            }
             # {
             #   'import_path': 'chatterbot.logic.LowConfidenceAdapter',
             #   'threshold': 0.65,
@@ -221,7 +225,6 @@ def chat_bot():
             # {
             #   'import_path': 'chatterbot.logic.TimeLogicAdapter'
             # }
-
         ],
 
         trainer='chatterbot.trainers.ListTrainer'
@@ -232,9 +235,7 @@ def chat_bot():
 
 
 def english_training():
-    ''' https://github.com/gunthercox/ChatterBot '''
-
-    from chatterbot.trainers import ChatterBotCorpusTrainer
+    ''' Train basic english '''
 
     LOG.info('Teaching bot basic english...')
     bot = chat_bot()
@@ -251,8 +252,6 @@ def ubuntu_training():
     Ubuntu Corpus of conversation dialog.
     '''
 
-    from chatterbot.trainers import UbuntuCorpusTrainer
-
     LOG.info('Training bot with ubuntu corpus trainer')
     bot = chat_bot()
 
@@ -267,27 +266,23 @@ def reddit_training():
 
     bot = chat_bot()
     reddit = get_reddit()
-    # reddit.read_only = True
+    reddit.read_only = True
     LOG.info('Read only?: %s', reddit.read_only)
 
-    lim = 9
+    lim = 99
     sub = 'all'
-    # sub = 'food'
-    # sub = 'SubredditSimulator'
-    slp = 3
+    slp = 0.03
 
     for submission in reddit.subreddit(sub).hot(limit=lim):
-
-        # easily exceeding rate limits, so we'll sleep
-        sleep(slp)
 
         try:
             LOG.info('Title: %s', submission.title)
             LOG.info('Score: %s', submission.score)
             LOG.info('ID: %s', submission.id)
             LOG.info('URL: %s', submission.url)
-            LOG.info('Author: %s', submission.author)
-            LOG.info('Link karma: %s', submission.author.link_karma)
+            if submission.author:
+                LOG.info('Author: %s', submission.author)
+                LOG.info('Link karma: %s', submission.author.link_karma)
 
             # Comments
             submission.comments.replace_more(limit=0)
@@ -295,7 +290,12 @@ def reddit_training():
 
             for comment in comments_list:
 
-                sub_comments = get_sub_comments(comment)
+                sleep(slp)
+                sub_comments = []
+                sub_comments.append(submission.title)
+                sub_comments.append(comment.body)
+                for _idx, child in enumerate(comment.replies):
+                    sub_comments.append(child.body)
 
                 LOG.info('Training: %s', sub_comments)
                 bot.train(sub_comments)
@@ -348,32 +348,59 @@ def twitter_training():
     bot.logger.info('Trained database generated successfully!')
 
 
-def manual_training():
-    ''' talk to your bot!
-        train your bot!
-    '''
+def get_feedback(input_statement, response):
+
+    print('\n Input -> {} \n'.format(input_statement))
+    print('\n Output -> {} \n'.format(response))
+    print('\n Does this make sense? \n')
+
+    text = input_function()
+
+    if 'yes' in text.lower():
+        return True
+    elif 'no' in text.lower():
+        return False
+    else:
+        print('Please type either "Yes" or "No"')
+        return get_feedback()
+
+
+
+def loop_trainer(input_s):
+    ''' loop through input_statements '''
 
     bot = chat_bot()
-    response = 'How can I help you?'
+    session = bot.conversation_sessions.new()
+    session_id = session.id
 
-    while True:
+    for i in range(3):
 
         try:
-            training = []
-            response = '%s: ' % response
-            comment = input(response)
-            training.append(str(response))
-            training.append(str(comment))
-            response = bot.get_response(comment)
-            LOG.info('Comment: %s', comment)
-            LOG.info('Response: %s', response)
-            LOG.info('Training bot: %s', training)
-            bot.train(training)
+            input_statement = bot.input.process_input_statement(input_s)
+            statement, response = bot.generate_response(input_statement, session_id)
+            bot.learn_response(response, input_statement)
+            bot.conversation_sessions.update(session_id, statement)
+            bot.output.process_response(response)
 
         except (KeyboardInterrupt, EOFError, SystemExit):
             break
 
     return
+
+
+def word_list_training():
+    ''' take word list
+        train bot word in list for loop amount
+    '''
+
+    filename = 'list_5000'
+    word_list = open(filename, "r")
+    work = [(line.strip('\n')) for line in word_list]
+    random.shuffle(work)
+    pool = multiprocessing.Pool(4)
+    pool.map(loop_trainer, work)
+    pool.close()
+    pool.join()
 
 
 def feedback_training():
@@ -384,45 +411,26 @@ def feedback_training():
     """
 
     bot = chat_bot()
+    session = bot.conversation_sessions.new()
+    session_id = session.id
 
-    CONVERSATION_ID = bot.storage.create_conversation()
-
-    def get_feedback():
-        ''' user feedback '''
-
-        text = input_function()
-
-        if 'yes' in text.lower():
-            return True
-        elif 'no' in text.lower():
-            return False
-        else:
-            print('Please type either "Yes" or "No"')
-            return get_feedback()
-
-
-    print('Type something to begin...')
-
-    # The following loop will execute each time the user enters input
     while True:
-        try:
-            # input_statement = bot.input.process_input_statement()
-            # input_statement = input()
-            input_statement = input_function()
-            statement, response = bot.generate_response(input_statement, CONVERSATION_ID)
-            print('\n Is "{}" this a coherent response to "{}"? \n'.format(response, input_statement))
 
-            if get_feedback():
+        try:
+            comment = input('input -> ')
+            input_statement = bot.input.process_input_statement(comment)
+            statement, response = bot.generate_response(input_statement, session_id)
+
+            if get_feedback(input_statement, response):
                 bot.learn_response(response, input_statement)
-                # Update the conversation history for the bot
-                # It is important that this happens last, after the learning step
-                bot.storage.add_to_conversation(CONVERSATION_ID, statement, response)
+                # bot.conversation_sessions.update(session_id, statement)
 
             bot.output.process_response(response)
 
-        # Press ctrl-c or ctrl-d on the keyboard to exit
         except (KeyboardInterrupt, EOFError, SystemExit):
             break
+
+    return
 
 
 def hipchat_bot():
@@ -448,25 +456,11 @@ def hipchat_bot():
         trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
     )
 
-    # bot.train('chatterbot.corpus.english')
-
-    response = 'Hello Human'
     # The following loop will execute each time the user enters input
     while True:
         try:
+
             response = bot.get_response(None)
-            # response = bot.get_response(None)
-            # LOG.debug(response)
-            # training = []
-            # response = '%s: ' % response
-            # comment = input(response)
-            # training.append(str(response))
-            # training.append(str(comment))
-            # response = bot.get_response(comment)
-            # LOG.info('Comment: %s', comment)
-            # LOG.info('Response: %s', response)
-            # LOG.info('Training bot: %s', training)
-            # bot.train(training)
 
         # Press ctrl-c or ctrl-d on the keyboard to exit
         except (KeyboardInterrupt, EOFError, SystemExit):
@@ -479,7 +473,7 @@ def gitter_bot():
     gitter_room, gitter_api_token = get_gitter_envars()
 
     bot = ChatBot(
-        'Useless Bot',
+        'Gitter Bot',
         storage_adapter='chatterbot.storage.MongoDatabaseAdapter',
         database='bot_db',
         database_uri='mongodb://mongo:27017/',
@@ -488,22 +482,51 @@ def gitter_bot():
         gitter_only_respond_to_mentions=False,
         input_adapter='chatterbot.input.Gitter',
         output_adapter='chatterbot.output.Gitter',
-        trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
     )
+    """
+    {'id': '59c8097c614889d47534c2fe',
+     'text': 'test',
+     'html': 'test',
+     'sent': '2017-09-24T19:37:32.559Z',
+     'fromUser': {'id': '59c4bd8ed73408ce4f76e071',
+                  'username': 'jahrik',
+                  'displayName': 'jahrik',
+                  'url': '/jahrik',
+                  'avatarUrl': 'https://avatars-04.gitter.im/gh/uv/4/jahrik',
+                  'avatarUrlSmall': 'https://avatars0.githubusercontent.com/u/3237460?v=4&s=60',
+                  'avatarUrlMedium': 'https://avatars0.githubusercontent.com/u/3237460?v=4&s=128', 'gv': '4'},
+     'unread': False,
+     'readBy': 0,
+     'urls': [],
+     'mentions': [],
+     'issues': [],
+     'meta': [],
+     'v': 1}
+    """
+    session_id = bot.default_session.uuid
 
-    # bot.train('chatterbot.corpus.english')
-
-    c_id = bot.default_session.uuid
-    response = 'Hello Human'
-    # The following loop will execute each time the user enters input
     while True:
         try:
-            response = bot.get_response(None, c_id)
-
+            data = bot.input.get_most_recent_message()
+            input_s = data.get('text')
+            print(input_s)
+            input_statement = bot.input.process_input(input_s)
+            statement, response = bot.generate_response(input_statement, session_id)
+            print(response)
+            # print(statement)
+            # statement, response = bot.generate_response(input_statement, session_id)
+            # print(statement)
+            # print(response)
+            # respond = bot.ouput.gitter.send_message(reponse)
+            # bot.learn_response(response, input_statement)
+            # bot.conversation_sessions.update(session_id, statement)
+            # bot.output.process_response(response)
 
         # Press ctrl-c or ctrl-d on the keyboard to exit
         except (KeyboardInterrupt, EOFError, SystemExit):
             break
+
+    return
 
 
 def main():
@@ -516,8 +539,8 @@ def main():
 
     if training == 'english':
         english_training()
-    elif training == 'manual':
-        manual_training()
+    elif training == 'word_list':
+        word_list_training()
     elif training == 'feedback':
         feedback_training()
     elif training == 'ubuntu':
