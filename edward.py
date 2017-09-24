@@ -43,6 +43,7 @@ from chatterbot.utils import input_function
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot.trainers import UbuntuCorpusTrainer
 
+VERSION='0.1.1'
 
 def logging_setup():
     ''' Setup the logging '''
@@ -532,7 +533,7 @@ def gitter_bot():
 def main():
     ''' main '''
 
-    argument = docopt(__doc__, version='1.0.0')
+    argument = docopt(__doc__, version=VERSION)
 
     if '--training' in argument and argument.get('--training'):
         training = argument.get('--training')
