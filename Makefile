@@ -1,4 +1,4 @@
-VERSION = "0.0.1"
+VERSION = "0.1.1"
 
 all: build
 
@@ -16,7 +16,7 @@ destroy:
 	@docker stack rm edward
 	@docker-compose down
 
-n ?= 10
+n ?= 5
 train:
 	python edward.py -t english
 	python edward.py -t reddit
