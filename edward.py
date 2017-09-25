@@ -31,8 +31,8 @@
 
 import os
 import sys
-import logging
 import random
+import logging
 from logging import StreamHandler
 from time import sleep
 import multiprocessing
@@ -43,11 +43,11 @@ from chatterbot.utils import input_function
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot.trainers import UbuntuCorpusTrainer
 
-VERSION='0.1.1'
+VERSION = '0.1.1'
 
 def logging_setup():
     ''' Setup the logging '''
-    argument = docopt(__doc__, version='1.0.0')
+    argument = docopt(__doc__, version=VERSION)
     if '--level' in argument and argument.get('--level'):
         level = getattr(logging, argument.get('--level').upper())
     else:
@@ -350,6 +350,11 @@ def twitter_training():
 
 
 def get_feedback(input_statement, response):
+    '''
+    Present input_statement and response to user
+    Ask if it makes sense
+    Set True or False
+    '''
 
     print('\n Input -> {} \n'.format(input_statement))
     print('\n Output -> {} \n'.format(response))
@@ -441,35 +446,36 @@ def hipchat_bot():
     '''
 
     hipchat_host, hipchat_room, hipchat_access_token = get_hipchat_envars()
-    # bot = chat_bot()
 
     bot = ChatBot(
-        'Useless Bot',
+        'Hipchat Bot',
         storage_adapter='chatterbot.storage.MongoDatabaseAdapter',
         database='bot_db',
         database_uri='mongodb://mongo:27017/',
         hipchat_host=hipchat_host,
         hipchat_room=hipchat_room,
         hipchat_access_token=hipchat_access_token,
-        # input_adapter="chatterbot.input.HipChat",
-        input_adapter="chatterbot.input.TerminalAdapter",
+        input_adapter='chatterbot.input.HipChat',
         output_adapter='chatterbot.output.HipChat',
         trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
     )
 
-    # The following loop will execute each time the user enters input
     while True:
         try:
 
             response = bot.get_response(None)
 
-        # Press ctrl-c or ctrl-d on the keyboard to exit
         except (KeyboardInterrupt, EOFError, SystemExit):
             break
 
 
 def gitter_bot():
-    ''' gitter bot '''
+    """
+    Gitter bot
+
+    https://gitter.im/jahrik/edward
+
+    """
 
     gitter_room, gitter_api_token = get_gitter_envars()
 
@@ -483,47 +489,14 @@ def gitter_bot():
         gitter_only_respond_to_mentions=False,
         input_adapter='chatterbot.input.Gitter',
         output_adapter='chatterbot.output.Gitter',
+        trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
     )
-    """
-    {'id': '59c8097c614889d47534c2fe',
-     'text': 'test',
-     'html': 'test',
-     'sent': '2017-09-24T19:37:32.559Z',
-     'fromUser': {'id': '59c4bd8ed73408ce4f76e071',
-                  'username': 'jahrik',
-                  'displayName': 'jahrik',
-                  'url': '/jahrik',
-                  'avatarUrl': 'https://avatars-04.gitter.im/gh/uv/4/jahrik',
-                  'avatarUrlSmall': 'https://avatars0.githubusercontent.com/u/3237460?v=4&s=60',
-                  'avatarUrlMedium': 'https://avatars0.githubusercontent.com/u/3237460?v=4&s=128', 'gv': '4'},
-     'unread': False,
-     'readBy': 0,
-     'urls': [],
-     'mentions': [],
-     'issues': [],
-     'meta': [],
-     'v': 1}
-    """
-    session_id = bot.default_session.uuid
 
     while True:
         try:
-            data = bot.input.get_most_recent_message()
-            input_s = data.get('text')
-            print(input_s)
-            input_statement = bot.input.process_input(input_s)
-            statement, response = bot.generate_response(input_statement, session_id)
-            print(response)
-            # print(statement)
-            # statement, response = bot.generate_response(input_statement, session_id)
-            # print(statement)
-            # print(response)
-            # respond = bot.ouput.gitter.send_message(reponse)
-            # bot.learn_response(response, input_statement)
-            # bot.conversation_sessions.update(session_id, statement)
-            # bot.output.process_response(response)
 
-        # Press ctrl-c or ctrl-d on the keyboard to exit
+            response = bot.get_response(None)
+
         except (KeyboardInterrupt, EOFError, SystemExit):
             break
 
