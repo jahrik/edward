@@ -42,6 +42,8 @@ from chatterbot import ChatBot
 from chatterbot.utils import input_function
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot.trainers import UbuntuCorpusTrainer
+# import chatterbot_voice
+# import warnings
 
 VERSION = '0.1.1'
 
@@ -321,8 +323,7 @@ def reddit_training():
 
 def twitter_training():
     '''
-    This example demonstrates how you can train your chat bot
-    using data from Twitter.
+    Train bot using data from Twitter.
     '''
 
     twitter_key, twitter_secret, twitter_token, twitter_token_secret = get_twitter_envars()
@@ -446,6 +447,7 @@ def hipchat_bot():
     '''
 
     hipchat_host, hipchat_room, hipchat_access_token = get_hipchat_envars()
+    print(hipchat_host, hipchat_room, hipchat_access_token)
 
     bot = ChatBot(
         'Hipchat Bot',
@@ -503,6 +505,32 @@ def gitter_bot():
     return
 
 
+def voice_bot():
+    '''
+    Voice bot
+    "FileNotFoundError: [Errno 2] No such file or directory: 'jack_control'"
+        https://wiki.archlinux.org/index.php/JACK_Audio_Connection_Kit
+    '''
+
+    bot = ChatBot(
+        "Voice Bot",
+        storage_adapter='chatterbot.storage.MongoDatabaseAdapter',
+        database='bot_db',
+        database_uri='mongodb://mongo:27017/',
+        input_adapter="chatterbot_voice.VoiceInput",
+        output_adapter="chatterbot_voice.VoiceOutput",
+        # recognizer_instance="recognize_google_cloud",
+    )
+
+    while True:
+        try:
+
+            bot_input = bot.get_response(None)
+
+        # Press ctrl-c or ctrl-d on the keyboard to exit
+        except (KeyboardInterrupt, EOFError, SystemExit):
+            break
+
 def main():
     ''' main '''
 
@@ -527,6 +555,8 @@ def main():
         hipchat_bot()
     elif training == 'gitter':
         gitter_bot()
+    elif training == 'voice':
+        voice_bot()
     else:
         LOG.error('Unknown training mode')
 
