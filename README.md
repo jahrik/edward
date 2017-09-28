@@ -23,33 +23,33 @@ export GITTER_API_TOKEN=
 ```
 
 ## TOC
-   * [Edward](#edward)
-      * [Dependencies](#dependencies)
-      * [Usage](#usage)
-      * [Module defs](#module-defs)
-            * [bot_on_bot()](#bot_on_bot)
-            * [bot_sploit()](#bot_sploit)
-            * [chat_bot()](#chat_bot)
-            * [emoji_preprocessor(bot, statement)](#emoji_preprocessorbot-statement)
-            * [english_training()](#english_training)
-            * [export(filename=None)](#exportfilenamenone)
-            * [feedback_bot()](#feedback_bot)
-            * [get_gitter_envars()](#get_gitter_envars)
-            * [get_hipchat_envars()](#get_hipchat_envars)
-            * [get_reddit()](#get_reddit)
-            * [get_reddit_envars()](#get_reddit_envars)
-            * [get_sub_comments(comment)](#get_sub_commentscomment)
-            * [get_twitter_envars()](#get_twitter_envars)
-            * [gitter_bot()](#gitter_bot)
-            * [hipchat_bot()](#hipchat_bot)
-            * [logging_setup()](#logging_setup)
-            * [loop_trainer(input_s)](#loop_trainerinput_s)
-            * [main()](#main)
-            * [reddit_training()](#reddit_training)
-            * [twitter_training()](#twitter_training)
-            * [ubuntu_training()](#ubuntu_training)
-            * [voice_bot()](#voice_bot)
-            * [word_list_training()](#word_list_training)
+  * [Edward](#edward)
+    * [Dependencies](#dependencies)
+    * [Usage](#usage)
+    * [Module defs](#module-defs)
+        * [bot_on_bot()](#bot_on_bot)
+        * [bot_sploit()](#bot_sploit)
+        * [chat_bot()](#chat_bot)
+        * [emoji_preprocessor(bot, statement)](#emoji_preprocessorbot-statement)
+        * [english_training()](#english_training)
+        * [export(filename=None)](#exportfilenamenone)
+        * [feedback_bot()](#feedback_bot)
+        * [get_gitter_envars()](#get_gitter_envars)
+        * [get_hipchat_envars()](#get_hipchat_envars)
+        * [get_reddit()](#get_reddit)
+        * [get_reddit_envars()](#get_reddit_envars)
+        * [get_sub_comments(comment)](#get_sub_commentscomment)
+        * [get_twitter_envars()](#get_twitter_envars)
+        * [gitter_bot()](#gitter_bot)
+        * [hipchat_bot()](#hipchat_bot)
+        * [logging_setup()](#logging_setup)
+        * [loop_trainer(input_s)](#loop_trainerinput_s)
+        * [main()](#main)
+        * [reddit_training()](#reddit_training)
+        * [twitter_training()](#twitter_training)
+        * [ubuntu_training()](#ubuntu_training)
+        * [voice_bot()](#voice_bot)
+        * [word_list_training()](#word_list_training)
 ## Usage
 ```
 Usage:
@@ -113,25 +113,28 @@ Train bot
 
 #### `get_gitter_envars()`
 
-* Set Gitter room and api token.
-* You can obtain an api token at:
-* https://developer.gitter.im/apps
-
-return gitter_room, gitter_api_token
+* get Gitter room and api token from envars
+* you can obtain an api token at:
+** https://developer.gitter.im/apps
+* return gitter_room, gitter_api_token
 
 #### `get_hipchat_envars()`
 
-Set HipChat room and api token.
-You can obtain an api token at:
-https://hipchat.com/admin/api
+* get HipChat host, room, and api token from envars
+* you can obtain an api token at:
+** https://hipchat.com/admin/api
+* return hipchat_host, hipchat_room, hipchat_access_token
 
 #### `get_reddit()`
 
-Get praw.Reddit
+* obtain client_id, client_secret, username, password from [get_reddit_envars()](#get_reddit_envars)
+* set reddit to praw.Reddit
+* return reddit
 
 #### `get_reddit_envars()`
 
-Reddit creds
+* get Reddit creds from envars
+* return client_id, client_secret, username, password
 
 #### `get_sub_comments(comment)`
 
@@ -139,7 +142,8 @@ get sub comments from a reddit comment object as a list
 
 #### `get_twitter_envars()`
 
-Set Twitter creds
+* get Twitter creds from envars
+* return twitter_key, twitter_secret, twitter_token, twitter_token_secret
 
 #### `gitter_bot()`
 
@@ -155,9 +159,8 @@ https://developer.atlassian.com/hipchat/guide/hipchat-rest-api/api-access-tokens
 
 #### `logging_setup()`
 
-Setup logging
-
-return logger
+* setup logging
+* return logger
 
 #### `loop_trainer(input_s)`
 
