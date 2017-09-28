@@ -92,13 +92,13 @@ qyio6ac50xyt        edward_bot          replicated          1/1                 
 ## Module defs
 #### `bot_on_bot()`
 
-make bot talk to another bot.
-https://www.tolearnenglish.com/free/celebs/audreyg.php
+* make bot talk to another bot.
+* https://www.tolearnenglish.com/free/celebs/audreyg.php
 
 #### `bot_sploit()`
 
-Search for other bots on reddit
-Talk to the other bots on reddit
+* Search for other bots on reddit
+* Talk to the other bots on reddit
 
 #### `chat_bot()`
 
@@ -108,10 +108,10 @@ Talk to the other bots on reddit
 
 #### `emoji_preprocessor(bot, statement)`
 
-input emojis to chatterbot
-http://chatterbot.readthedocs.io/en/stable/preprocessors.html
-http://www.unicode.org/emoji/charts/full-emoji-list.html
-https://github.com/gunthercox/ChatterBot/issues/911
+* input emojis to chatterbot
+* http://chatterbot.readthedocs.io/en/stable/preprocessors.html
+* http://www.unicode.org/emoji/charts/full-emoji-list.html
+* https://github.com/gunthercox/ChatterBot/issues/911
 
 #### `english_training()`
 
@@ -121,15 +121,16 @@ https://github.com/gunthercox/ChatterBot/issues/911
 
 #### `export(filename=None)`
 
-export the database
-mongoexport -d bot_db -c statements
+* export the database
+* mongoexport -d bot_db -c statements
 
 #### `feedback_bot()`
 
-Present input_statement and response to user
-Ask if it makes sense
-If no, fix
-Train bot
+* ask for input
+* present input_statement and response to user
+* ask if it makes sense
+* if no, user can fix
+* train bot
 
 #### `get_gitter_envars()`
 
@@ -169,15 +170,14 @@ Train bot
 
 #### `gitter_bot()`
 
-Gitter bot
+* get gitter_room, gitter_api_token from [get_gitter_envars()](#get_gitter_envars)
 
-https://gitter.im/jahrik/edward
-
+Talk to bot with twitter or github access
+* https://gitter.im/jahrik/edward
 
 #### `hipchat_bot()`
 
-See the HipChat api documentation for how to get a user access token.
-https://developer.atlassian.com/hipchat/guide/hipchat-rest-api/api-access-tokens
+DOES NOT WORK YET
 
 #### `logging_setup()`
 
@@ -186,11 +186,19 @@ https://developer.atlassian.com/hipchat/guide/hipchat-rest-api/api-access-tokens
 
 #### `loop_trainer(input_s)`
 
-loop through input_statements
+- **`input_s`** `str` `required` `default = None`
+
+   Input string
+
+* input string
+* process as input_statement
+* get statement and response form chat bot
+* if the response is not the same as the input string
+* train bot with conversation
 
 #### `main()`
 
-main
+* check docopt args
 
 #### `reddit_training(sub, lim)`
 
@@ -234,9 +242,12 @@ Train bot using data from Twitter.
 
 #### `voice_bot()`
 
-Voice bot
+* input speech to text
+* output text to speech
 
 #### `word_list_training()`
 
-take word list
-train bot word in list for loop amount
+* word_list contains 5000 most common words in English language
+* randomize the list
+* pool 4 child processes
+* run [loop_trainer(input_s)](#loop_trainerinput_s) with word as input s 
