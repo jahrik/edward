@@ -116,7 +116,8 @@ Train bot
 * Set Gitter room and api token.
 * You can obtain an api token at:
 * https://developer.gitter.im/apps
-returns gitter_room, gitter_api_token
+
+return gitter_room, gitter_api_token
 
 #### `get_hipchat_envars()`
 
@@ -155,6 +156,8 @@ https://developer.atlassian.com/hipchat/guide/hipchat-rest-api/api-access-tokens
 #### `logging_setup()`
 
 Setup logging
+
+return logger
 
 #### `loop_trainer(input_s)`
 
