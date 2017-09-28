@@ -86,7 +86,9 @@ Talk to the other bots on reddit
 
 #### `chat_bot()`
 
-https://github.com/gunthercox/ChatterBot
+* https://github.com/gunthercox/ChatterBot
+* Create default bot
+* return chatbot
 
 #### `emoji_preprocessor(bot, statement)`
 
@@ -97,7 +99,9 @@ https://github.com/gunthercox/ChatterBot/issues/911
 
 #### `english_training()`
 
-Train basic english
+* get base bot [chat_bot()](#chat_bot)
+* train basic english with
+* [chatterbot.corpus.english](https://github.com/gunthercox/chatterbot-corpus/tree/master/chatterbot_corpus/data/english)
 
 #### `export(filename=None)`
 
@@ -115,14 +119,14 @@ Train bot
 
 * get Gitter room and api token from envars
 * you can obtain an api token at:
-** https://developer.gitter.im/apps
+* https://developer.gitter.im/apps
 * return gitter_room, gitter_api_token
 
 #### `get_hipchat_envars()`
 
 * get HipChat host, room, and api token from envars
 * you can obtain an api token at:
-** https://hipchat.com/admin/api
+* https://hipchat.com/admin/api
 * return hipchat_host, hipchat_room, hipchat_access_token
 
 #### `get_reddit()`
@@ -138,7 +142,9 @@ Train bot
 
 #### `get_sub_comments(comment)`
 
-get sub comments from a reddit comment object as a list
+* get sub comments from a reddit comment object as a list
+* generate a list of sub_comments from all replies
+* return sub_comments
 
 #### `get_twitter_envars()`
 
@@ -172,7 +178,29 @@ main
 
 #### `reddit_training()`
 
-Grab lim comment trees from r/sub to train the bot
+* get base bot [chat_bot()](#chat_bot)
+* get reddit from [get_reddit()](#get_reddit)
+* configure read only true/false
+* sub = the subreddit to use
+* lim = the amount of submissions to grab from a chosen subreddit
+* slp = is set to keep from reaching reddit server rate limits
+
+* training list starts as an empty list []
+
+* for every submission
+* collect comment chains
+
+* for every comment in comment chains
+* if the comment is not '[deleted]'
+* collect reply chain
+* append training list
+
+* for every reply in reply chain
+* if reply is not '[removed]'
+* if reply is < 80 characters
+* append training list
+
+* Train the bot
 
 #### `twitter_training()`
 
@@ -180,8 +208,11 @@ Train bot using data from Twitter.
 
 #### `ubuntu_training()`
 
-This is an example showing how to train a chat bot using the
-Ubuntu Corpus of conversation dialog.
+* *THIS IS BROKEN RIGHT NOW*
+* get base bot [chat_bot()](#chat_bot)
+* train with ubuntu corpus
+* [chatterbot.corpus.ubuntu](https://github.com/gunthercox/ChatterBot/blob/b611cbd0629eb2aed9f840b50d1b3f8869c2589e/chatterbot/trainers.py#L236)
+* see [Training with the Ubuntu dialog corpus](http://chatterbot.readthedocs.io/en/stable/training.html#training-with-the-ubuntu-dialog-corpus)
 
 #### `voice_bot()`
 
