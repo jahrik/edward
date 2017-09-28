@@ -45,7 +45,7 @@ export GITTER_API_TOKEN=
         * [logging_setup()](#logging_setup)
         * [loop_trainer(input_s)](#loop_trainerinput_s)
         * [main()](#main)
-        * [reddit_training()](#reddit_training)
+        * [reddit_training(sub, lim)](#reddit_trainingsub-lim)
         * [twitter_training()](#twitter_training)
         * [ubuntu_training()](#ubuntu_training)
         * [voice_bot()](#voice_bot)
@@ -176,9 +176,17 @@ loop through input_statements
 
 main
 
-#### `reddit_training()`
+#### `reddit_training(sub, lim)`
 
-*configure*
+- **`sub`** `str` `optional` `default = 'all'`
+
+   Which subreddit to use
+
+- **`lim`** `int` `optional` `default = 9`
+
+   how many to grab
+
+Configure
 * get base bot [chat_bot()](#chat_bot)
 * get reddit from [get_reddit()](#get_reddit)
 * configure read only true/false
@@ -186,7 +194,7 @@ main
 * lim = the amount of submissions to grab from a chosen subreddit
 * slp = is set to keep from reaching reddit server rate limits
 
-*training*
+Training
 * training list starts as an empty list []
 * for every submission collect comment chains
 * for every comment in comment chains collect all replies
