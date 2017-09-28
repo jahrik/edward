@@ -178,6 +178,7 @@ main
 
 #### `reddit_training()`
 
+*configure*
 * get base bot [chat_bot()](#chat_bot)
 * get reddit from [get_reddit()](#get_reddit)
 * configure read only true/false
@@ -185,21 +186,14 @@ main
 * lim = the amount of submissions to grab from a chosen subreddit
 * slp = is set to keep from reaching reddit server rate limits
 
+*training*
 * training list starts as an empty list []
-
-* for every submission
-* collect comment chains
-
-* for every comment in comment chains
+* for every submission collect comment chains
+* for every comment in comment chains collect all replies
 * if the comment is not '[deleted]'
-* collect reply chain
-* append training list
-
-* for every reply in reply chain
 * if reply is not '[removed]'
 * if reply is < 80 characters
 * append training list
-
 * Train the bot
 
 #### `twitter_training()`
