@@ -1,77 +1,16 @@
-# Edward
-* A small bot that utilizes praw and chatterbot to connect to multiple services
-* chatterbot: https://github.com/gunthercox/ChatterBot
-* PRAW: https://praw.readthedocs.io/en/latest/
-
-## Dependencies
-* python 3.5+
-* Be sure to export envars first:
+Build and test with docker-compose
 ```
-export REDDIT_CLIENT_ID=
-export REDDIT_CLIENT_SECRET=
-export REDDIT_USERNAME=
-export REDDIT_PASSWORD=
-export TWITTER_KEY=
-export TWITTER_SECRET=
-export TWITTER_TOKEN=
-export TWITTER_TOKEN_SECRET=
-export HIPCHAT_HOST=
-export HIPCHAT_ROOM=
-export HIPCHAT_ACCESS_TOKEN=
-export GITTER_ROOM=
-export GITTER_API_TOKEN=
+make test
 ```
 
-## TOC
-  * [Edward](#edward)
-    * [Dependencies](#dependencies)
-    * [Usage](#usage)
-    * [Module defs](#module-defs)
-        * [bot_on_bot()](#bot_on_bot)
-        * [bot_sploit()](#bot_sploit)
-        * [chat_bot()](#chat_bot)
-        * [emoji_preprocessor(bot, statement)](#emoji_preprocessorbot-statement)
-        * [english_training()](#english_training)
-        * [export(filename=None)](#exportfilenamenone)
-        * [feedback_bot()](#feedback_bot)
-        * [get_gitter_envars()](#get_gitter_envars)
-        * [get_hipchat_envars()](#get_hipchat_envars)
-        * [get_reddit()](#get_reddit)
-        * [get_reddit_envars()](#get_reddit_envars)
-        * [get_sub_comments(comment)](#get_sub_commentscomment)
-        * [get_twitter_envars()](#get_twitter_envars)
-        * [gitter_bot()](#gitter_bot)
-        * [hipchat_bot()](#hipchat_bot)
-        * [logging_setup()](#logging_setup)
-        * [loop_trainer(input_s)](#loop_trainerinput_s)
-        * [main()](#main)
-        * [reddit_training(sub, lim)](#reddit_trainingsub-lim)
-        * [twitter_training()](#twitter_training)
-        * [ubuntu_training()](#ubuntu_training)
-        * [voice_bot()](#voice_bot)
-        * [word_list_training()](#word_list_training)
-## Usage
+Build and deploy to docker swarm
 ```
-Usage:
-    ./edward.py [-l <level> | --level   <level>]
-                [-t  <type> | --training <type>]
-                [-b   <bot> | --bot       <bot>]
-                [-e         | --export   <file>]
-                [-h         | --help           ]
-                [--version  ]
+make deploy
 
-Options:
-    -h --help               Show this screen and exit
-    --version               Show version and exit
-    -l --level=<level>      [default: info]
-    -t --training=<type>    Training type:
-                                english, word_list,
-                                ubuntu, reddit, twitter
-                                [default: None]
-
-    -b --bot=<bot>          Run bot: [default: help]
-                                gitter, hipchat, voice, feedback
-                                [default: None]
+docker stack services edward
+ID                  NAME                MODE                REPLICAS            IMAGE               PORTS
+i3laoiilqi76        edward_mongo        replicated          1/1                 mongo:latest        *:27017->27017/tcp
+qyio6ac50xyt        edward_bot          replicated          1/1                 bot:latest
 ```
 ## Module defs
 #### `bot_on_bot()`
