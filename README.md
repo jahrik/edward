@@ -1,140 +1,186 @@
 # Edward
 * A small bot that utilizes praw and chatterbot to connect to multiple services
-* [PRAW](https://praw.readthedocs.io/en/latest/)
-* [ChatterBot](https://github.com/gunthercox/ChatterBot)
+* chatterbot: https://github.com/gunthercox/ChatterBot
+* PRAW: https://praw.readthedocs.io/en/latest/
 
-## Table of Contents
-
-  * [Usage:](#usage)
-  * [Training:](#training)
-     * [Manual](#manual)
-     * [Reddit](#reddit)
-     * [Twitter](#twitter)
-  * [Bots:](#training)
-     * [Gitter](#gitter)
-     * [Hipchat](#hipchat)
-  * [TODO:](#todo)
-
-## Usage: 
+## Dependencies
+* python 3.5+
+* Be sure to export envars first:
 ```
-./edward.py -h
-    A small bot that uses praw and chatterbot
-    Various training types include (manual, reddit, twitter, etc)
-
-    Usage:
-        bot.py [-l <level> | --level <level>]
-               [-t <type> | --training <type>]
-
-    Options:
-        -h --help               Show this screen
-        -l --level=<level>      [default: info]
-        -t --training=<type>    Training level [default: manual]
-
-    Be sure to export envars first:
-        export REDDIT_CLIENT_ID=
-        export REDDIT_CLIENT_SECRET=
-        export REDDIT_USERNAME=
-        export REDDIT_PASSWORD=
-        export TWITTER_KEY=
-        export TWITTER_SECRET=
-        export TWITTER_TOKEN=
-        export TWITTER_TOKEN_SECRET=
-        export HIPCHAT_HOST=
-        export HIPCHAT_ROOM=
-        export HIPCHAT_ACCESS_TOKEN=
-        export GITTER_ROOM=
-        export GITTER_API_TOKEN=
-
+export REDDIT_CLIENT_ID=
+export REDDIT_CLIENT_SECRET=
+export REDDIT_USERNAME=
+export REDDIT_PASSWORD=
+export TWITTER_KEY=
+export TWITTER_SECRET=
+export TWITTER_TOKEN=
+export TWITTER_TOKEN_SECRET=
+export HIPCHAT_HOST=
+export HIPCHAT_ROOM=
+export HIPCHAT_ACCESS_TOKEN=
+export GITTER_ROOM=
+export GITTER_API_TOKEN=
 ```
 
-## Training
-
-### Manual
-* train bot
-* raw input mode
-* bot will ask you how it can help?
-* and carry on a conversation from there
-* will take your response and learn from it
+## TOC
+   * [Edward](#edward)
+      * [Dependencies](#dependencies)
+      * [Usage](#usage)
+      * [Module defs](#module-defs)
+            * [bot_on_bot()](#bot_on_bot)
+            * [bot_sploit()](#bot_sploit)
+            * [chat_bot()](#chat_bot)
+            * [emoji_preprocessor(bot, statement)](#emoji_preprocessorbot-statement)
+            * [english_training()](#english_training)
+            * [export(filename=None)](#exportfilenamenone)
+            * [feedback_bot()](#feedback_bot)
+            * [get_gitter_envars()](#get_gitter_envars)
+            * [get_hipchat_envars()](#get_hipchat_envars)
+            * [get_reddit()](#get_reddit)
+            * [get_reddit_envars()](#get_reddit_envars)
+            * [get_sub_comments(comment)](#get_sub_commentscomment)
+            * [get_twitter_envars()](#get_twitter_envars)
+            * [gitter_bot()](#gitter_bot)
+            * [hipchat_bot()](#hipchat_bot)
+            * [logging_setup()](#logging_setup)
+            * [loop_trainer(input_s)](#loop_trainerinput_s)
+            * [main()](#main)
+            * [reddit_training()](#reddit_training)
+            * [twitter_training()](#twitter_training)
+            * [ubuntu_training()](#ubuntu_training)
+            * [voice_bot()](#voice_bot)
+            * [word_list_training()](#word_list_training)
+## Usage
 ```
-How can I help you?: hello
-...
-2017-09-21 05:13:45.822 INFO bot - bot_training: Comment: hello
-2017-09-21 05:13:45.823 INFO bot - bot_training: Response: hello
-2017-09-21 05:13:45.823 INFO bot - bot_training: Training bot: ['How can I help you?: ', 'hello']
-List Trainer: [####################] 100%
-hello: Good day!
-...
-2017-09-21 05:14:00.166 INFO bot - bot_training: Comment: Good day!
-2017-09-21 05:14:00.166 INFO bot - bot_training: Response: ok :) :)
-2017-09-21 05:14:00.166 INFO bot - bot_training: Training bot: ['hello: ', 'Good day!']
-List Trainer: [####################] 100%
-ok :) :): What are you?
-...
-2017-09-21 05:14:17.346 INFO bot - bot_training: Comment: What are you?
-2017-09-21 05:14:17.346 INFO bot - bot_training: Response: Who? Who is but a form following the function of what
-2017-09-21 05:14:17.346 INFO bot - bot_training: Training bot: ['ok :) :): ', 'What are you?']
-List Trainer: [####################] 100%
-Who? Who is but a form following the function of what:
-...
+Usage:
+    ./edward.py [-l <level> | --level   <level>]
+                [-t  <type> | --training <type>]
+                [-b   <bot> | --bot       <bot>]
+                [-e         | --export   <file>]
+                [-h         | --help           ]
+                [--version  ]
+
+Options:
+    -h --help               Show this screen and exit
+    --version               Show version and exit
+    -l --level=<level>      [default: info]
+    -t --training=<type>    Training type:
+                                english, word_list,
+                                ubuntu, reddit, twitter
+                                [default: None]
+
+    -b --bot=<bot>          Run bot: [default: help]
+                                gitter, hipchat, voice, feedback
+                                [default: None]
 ```
+## Module defs
+#### `bot_on_bot()`
 
-### Reddit
-* Specify a subreddit
-* Specify limit
-* bot will gather entire comment chain from limit of top posts
-* bot will train with comment chain
-* bot will respond to first comment
-```
-./bot.py -t reddit
-2017-09-21 05:29:39.826 INFO bot - reddit_mode: Read only?: False
-2017-09-21 05:29:44.488 INFO bot - reddit_mode: Title: Guardians of the Front Page
-2017-09-21 05:29:44.490 INFO bot - reddit_mode: Score: 283484
-2017-09-21 05:29:44.490 INFO bot - reddit_mode: ID: 5gn8ru
-2017-09-21 05:29:44.491 INFO bot - reddit_mode: URL: http://i.imgur.com/OOFRJvr.gifv
-2017-09-21 05:29:44.491 INFO bot - reddit_mode: Author: iH8myPP
-2017-09-21 05:29:44.647 INFO bot - reddit_mode: Link karma: 311141
-List Trainer: [####################] 100%
-...
-...
-```
+make bot talk to another bot.
+https://www.tolearnenglish.com/free/celebs/audreyg.php
 
-### Twitter
+#### `bot_sploit()`
 
-* cronjob runs every 10 minutes [here](https://github.com/jahrik/edward/blob/a011045b11c75d431c42511f0ec91c6799f745ec/crontab#L2)
-* Training
-```
-docker exec -it bot bash
-root@8d298baf24d5:/src# ./edward.py -t twitter
-2017-09-23 08:03:31.239 INFO trainers - get_statements: Requesting 50 random tweets containing the word from
-2017-09-23 08:03:34.138 INFO trainers - get_statements: Adding 8 tweets with responses
-2017-09-23 08:03:34.877 INFO trainers - get_statements: Requesting 50 random tweets containing the word Trust
-2017-09-23 08:03:37.857 INFO trainers - get_statements: Adding 8 tweets with responses
-2017-09-23 08:03:38.631 INFO trainers - get_statements: Requesting 50 random tweets containing the word picked
-2017-09-23 08:03:39.998 INFO trainers - get_statements: Adding 3 tweets with responses
-...
-...
-2017-09-23 08:04:00.921 INFO edward - twitter_training: Trained database generated successfully!
-```
+Search for other bots on reddit
+Talk to the other bots on reddit
 
-## Bots
+#### `chat_bot()`
 
-### Gitter
+https://github.com/gunthercox/ChatterBot
 
-* bot defaults to listening to gitter room
-* [https://gitter.im/jahrik/edward](https://gitter.im/jahrik/edward)
-* does not respond yet
+#### `emoji_preprocessor(bot, statement)`
+
+input emojis to chatterbot
+http://chatterbot.readthedocs.io/en/stable/preprocessors.html
+http://www.unicode.org/emoji/charts/full-emoji-list.html
+https://github.com/gunthercox/ChatterBot/issues/911
+
+#### `english_training()`
+
+Train basic english
+
+#### `export(filename=None)`
+
+export the database
+mongoexport -d bot_db -c statements
+
+#### `feedback_bot()`
+
+Present input_statement and response to user
+Ask if it makes sense
+If no, fix
+Train bot
+
+#### `get_gitter_envars()`
+
+Set Gitter room and api token.
+You can obtain an api token at:
+https://developer.gitter.im/apps
+
+#### `get_hipchat_envars()`
+
+Set HipChat room and api token.
+You can obtain an api token at:
+https://hipchat.com/admin/api
+
+#### `get_reddit()`
+
+Get praw.Reddit
+
+#### `get_reddit_envars()`
+
+Reddit creds
+
+#### `get_sub_comments(comment)`
+
+get sub comments from a reddit comment object as a list
+
+#### `get_twitter_envars()`
+
+Set Twitter creds
+
+#### `gitter_bot()`
+
+Gitter bot
+
+https://gitter.im/jahrik/edward
 
 
-### Hipchat
+#### `hipchat_bot()`
 
+See the HipChat api documentation for how to get a user access token.
+https://developer.atlassian.com/hipchat/guide/hipchat-rest-api/api-access-tokens
 
-## TODO:
-* connect to https://www.eviebot.com/en/
-* connect to http://www.cleverbot.com/
-* connect to facebook
-* connect to facebook messenger
-* fix hipchat bot
-* fix gitter bot
-* voice recognition from microphone
-* apple app
-* android app
+#### `logging_setup()`
+
+Setup logging
+
+#### `loop_trainer(input_s)`
+
+loop through input_statements
+
+#### `main()`
+
+main
+
+#### `reddit_training()`
+
+Grab lim comment trees from r/sub to train the bot
+
+#### `twitter_training()`
+
+Train bot using data from Twitter.
+
+#### `ubuntu_training()`
+
+This is an example showing how to train a chat bot using the
+Ubuntu Corpus of conversation dialog.
+
+#### `voice_bot()`
+
+Voice bot
+
+#### `word_list_training()`
+
+take word list
+train bot word in list for loop amount
