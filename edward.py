@@ -1,31 +1,25 @@
 #!/usr/bin/env python
 """
-    A small bot that uses praw and chatterbot
-    Various training types include (manual, reddit, twitter, etc)
+Usage:
+    ./edward.py [-l <level> | --level   <level>]
+                [-t  <type> | --training <type>]
+                [-b   <bot> | --bot       <bot>]
+                [-e         | --export   <file>]
+                [-h         | --help           ]
+                [--version  ]
 
-    Usage:
-        bot.py [-l <level> | --level <level>]
-               [-t <type> | --training <type>]
+Options:
+    -h --help               Show this screen and exit
+    --version               Show version and exit
+    -l --level=<level>      [default: info]
+    -t --training=<type>    Training type:
+                                english, word_list,
+                                ubuntu, reddit, twitter
+                                [default: None]
 
-    Options:
-        -h --help               Show this screen
-        -l --level=<level>      [default: info]
-        -t --training=<type>    Training level [default: feedback]
-
-    Be sure to export envars first:
-        export REDDIT_CLIENT_ID=
-        export REDDIT_CLIENT_SECRET=
-        export REDDIT_USERNAME=
-        export REDDIT_PASSWORD=
-        export TWITTER_KEY=
-        export TWITTER_SECRET=
-        export TWITTER_TOKEN=
-        export TWITTER_TOKEN_SECRET=
-        export HIPCHAT_HOST=
-        export HIPCHAT_ROOM=
-        export HIPCHAT_ACCESS_TOKEN=
-        export GITTER_ROOM=
-        export GITTER_API_TOKEN=
+    -b --bot=<bot>          Run bot: [default: help]
+                                gitter, hipchat, voice, feedback
+                                [default: None]
 
 """
 
@@ -42,13 +36,15 @@ from chatterbot import ChatBot
 from chatterbot.utils import input_function
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot.trainers import UbuntuCorpusTrainer
-# import chatterbot_voice
-# import warnings
 
 VERSION = '0.1.1'
 
+
 def logging_setup():
-    ''' Setup the logging '''
+    """
+    * setup logging
+    * return logger
+    """
     argument = docopt(__doc__, version=VERSION)
     if '--level' in argument and argument.get('--level'):
         level = getattr(logging, argument.get('--level').upper())
@@ -67,7 +63,12 @@ def logging_setup():
 
 
 def get_gitter_envars():
-    """ check if envars are set """
+    """
+    * get Gitter room and api token from envars
+    * obtain an api token at:
+    * https://developer.gitter.im/apps
+    * return gitter_room, gitter_api_token
+    """
 
     if os.environ.get('GITTER_ROOM') is None:
         LOG.error("export GITTER_ROOM=''")
@@ -85,7 +86,12 @@ def get_gitter_envars():
 
 
 def get_hipchat_envars():
-    """ check if envars are set """
+    """
+    * get HipChat host, room, and api token from envars
+    * obtain an api token at:
+    * https://hipchat.com/admin/api
+    * return hipchat_host, hipchat_room, hipchat_access_token
+    """
 
     if os.environ.get('HIPCHAT_HOST') is None:
         LOG.error("export HIPCHAT_HOST=''")
@@ -109,7 +115,10 @@ def get_hipchat_envars():
 
 
 def get_twitter_envars():
-    """ check if envars are set """
+    """
+    * get Twitter creds from envars
+    * return twitter_key, twitter_secret, twitter_token, twitter_token_secret
+    """
 
     if os.environ.get('TWITTER_KEY') is None:
         LOG.error("export TWITTER_KEY=''")
@@ -139,7 +148,10 @@ def get_twitter_envars():
 
 
 def get_reddit_envars():
-    """ check if envars are set """
+    """
+    * get Reddit creds from envars
+    * return client_id, client_secret, username, password
+    """
 
     if os.environ.get('REDDIT_CLIENT_ID') is None:
         LOG.error("export REDDIT_CLIENT_ID=''")
@@ -169,7 +181,11 @@ def get_reddit_envars():
 
 
 def get_reddit():
-    ''' Get praw.Reddit '''
+    """
+    * obtain client_id, client_secret, username, password from [get_reddit_envars()](#get_reddit_envars)
+    * set reddit to praw.Reddit
+    * return reddit
+    """
 
     client_id, client_secret, username, password = get_reddit_envars()
     LOG.debug('%s', client_id)
@@ -195,7 +211,11 @@ def get_reddit():
 
 
 def get_sub_comments(comment):
-    ''' get sub comments from a reddit comment object as a list '''
+    """
+    * get sub comments from a reddit comment object as a list
+    * generate a list of sub_comments from all replies
+    * return sub_comments
+    """
 
     sub_comments = []
     sub_comments.append(comment.body)
@@ -206,7 +226,11 @@ def get_sub_comments(comment):
 
 
 def chat_bot():
-    ''' https://github.com/gunthercox/ChatterBot '''
+    """
+    * https://github.com/gunthercox/ChatterBot
+    * Create default bot
+    * return chatbot
+    """
 
     chatbot = ChatBot(
         'Default Bot',
@@ -238,7 +262,11 @@ def chat_bot():
 
 
 def english_training():
-    ''' Train basic english '''
+    """
+    * get base bot [chat_bot()](#chat_bot)
+    * train basic english with
+    * [chatterbot.corpus.english](https://github.com/gunthercox/chatterbot-corpus/tree/master/chatterbot_corpus/data/english)
+    """
 
     LOG.info('Teaching bot basic english...')
     bot = chat_bot()
@@ -250,10 +278,13 @@ def english_training():
 
 
 def ubuntu_training():
-    '''
-    This is an example showing how to train a chat bot using the
-    Ubuntu Corpus of conversation dialog.
-    '''
+    """
+    * *THIS IS BROKEN RIGHT NOW*
+    * get base bot [chat_bot()](#chat_bot)
+    * train with ubuntu corpus
+    * [chatterbot.corpus.ubuntu](https://github.com/gunthercox/ChatterBot/blob/b611cbd0629eb2aed9f840b50d1b3f8869c2589e/chatterbot/trainers.py#L236)
+    * see [Training with the Ubuntu dialog corpus](http://chatterbot.readthedocs.io/en/stable/training.html#training-with-the-ubuntu-dialog-corpus)
+    """
 
     LOG.info('Training bot with ubuntu corpus trainer')
     bot = chat_bot()
@@ -264,46 +295,98 @@ def ubuntu_training():
     return
 
 
-def reddit_training():
-    ''' Grab lim comment trees from r/sub to train the bot '''
+def reddit_training(sub, lim):
+    """
+    Parameters
+    ----------
+    sub : str, optional, default = 'all'
+        Which subreddit to use
+
+    lim : int, optional, default = 9
+        how many to grab
+
+    Configure
+    * get base bot [chat_bot()](#chat_bot)
+    * get reddit from [get_reddit()](#get_reddit)
+    * configure read only true/false
+    * sub = the subreddit to use
+    * lim = the amount of submissions to grab from a chosen subreddit
+    * slp = is set to keep from reaching reddit server rate limits
+
+    Training
+    * training list starts as an empty list []
+    * for every submission collect comment chains
+    * for every comment in comment chains collect all replies
+    * if the comment is not '[deleted]'
+    * if reply is not '[removed]'
+    * if reply is < 80 characters
+    * append training list
+    * Train the bot
+    """
 
     bot = chat_bot()
     reddit = get_reddit()
     reddit.read_only = True
     LOG.info('Read only?: %s', reddit.read_only)
 
-    lim = 99
-    sub = 'all'
-    slp = 0.03
+    if sub:
+        sub = sub
+    else:
+        sub = 'all'
+
+    if lim:
+        lim = lim
+    else:
+        lim = 9
+    slp = 0.1
+
+    def parse_comments(comments_list):
+        """
+        I must have thought I needed this for something.
+        """
+        for comment in comments_list:
+            print(comment)
+        pass
 
     for submission in reddit.subreddit(sub).hot(limit=lim):
 
         try:
-            LOG.info('Title: %s', submission.title)
-            LOG.info('Score: %s', submission.score)
-            LOG.info('ID: %s', submission.id)
-            LOG.info('URL: %s', submission.url)
+            LOG.debug('Title: %s', submission.title)
+            LOG.debug('Score: %s', submission.score)
+            LOG.debug('ID: %s', submission.id)
+            LOG.debug('URL: %s', submission.url)
+            # If submission.author is NoneType it means the comment was [deleted]
             if submission.author:
-                LOG.info('Author: %s', submission.author)
-                LOG.info('Link karma: %s', submission.author.link_karma)
+                LOG.debug('Author: %s', submission.author)
+                LOG.debug('Link karma: %s', submission.author.link_karma)
 
-            # Comments
-            submission.comments.replace_more(limit=0)
-            comments_list = submission.comments.list()
+                # Comments
+                submission.comments.replace_more(limit=0)
+                comments_list = submission.comments.list()
 
-            for comment in comments_list:
+                for comment in comments_list:
 
-                sleep(slp)
-                sub_comments = []
-                sub_comments.append(submission.title)
-                sub_comments.append(comment.body)
-                for _idx, child in enumerate(comment.replies):
-                    sub_comments.append(child.body)
+                    sleep(slp)
+                    sub_comments = []
+                    # sub_comments.append(submission.title)
+                    sub_comments.append(comment.body)
+                    for _idx, rep in enumerate(comment.replies):
+                        reply = rep.body.strip('/r/').strip('^')
+                        if len(reply) < 80:
+                            if not reply == '[removed]':
+                                LOG.debug('Appending reply: %s', reply)
+                                sub_comments.append(reply)
+                        else:
+                            LOG.debug('Reply is too long')
 
-                LOG.info('Training: %s', sub_comments)
-                bot.train(sub_comments)
-
-            LOG.info('--------------------------------------------------------')
+                    # If comment chain is at least 5 long train bot.
+                    if len(sub_comments) < 5:
+                        LOG.debug('Skipping: %s', sub_comments)
+                    else:
+                        LOG.debug('Comment is %s statements long', len(sub_comments))
+                        bot.train(sub_comments)
+                        LOG.info('Training: %s', sub_comments)
+                        LOG.info('--------------------------------------------')
 
         except praw.exceptions.APIException as praw_exc:
             LOG.error('APIException: %s', praw_exc)
@@ -322,9 +405,9 @@ def reddit_training():
 
 
 def twitter_training():
-    '''
+    """
     Train bot using data from Twitter.
-    '''
+    """
 
     twitter_key, twitter_secret, twitter_token, twitter_token_secret = get_twitter_envars()
 
@@ -350,44 +433,33 @@ def twitter_training():
     bot.logger.info('Trained database generated successfully!')
 
 
-def get_feedback(input_statement, response):
-    '''
-    Present input_statement and response to user
-    Ask if it makes sense
-    Set True or False
-    '''
-
-    print('\n Input -> {} \n'.format(input_statement))
-    print('\n Output -> {} \n'.format(response))
-    print('\n Does this make sense? \n')
-
-    text = input_function()
-
-    if 'yes' in text.lower():
-        return True
-    elif 'no' in text.lower():
-        return False
-    else:
-        print('Please type either "Yes" or "No"')
-        return get_feedback()
-
-
-
 def loop_trainer(input_s):
-    ''' loop through input_statements '''
+    """
+    Parameters
+    ----------
+    input_s : str, required, default = None
+        Input string
+
+    * input string
+    * process as input_statement
+    * get statement and response form chat bot
+    * if the response is not the same as the input string
+    * train bot with conversation
+    """
 
     bot = chat_bot()
     session = bot.conversation_sessions.new()
     session_id = session.id
 
-    for i in range(3):
+    for _var in range(3):
 
         try:
             input_statement = bot.input.process_input_statement(input_s)
             statement, response = bot.generate_response(input_statement, session_id)
-            bot.learn_response(response, input_statement)
-            bot.conversation_sessions.update(session_id, statement)
-            bot.output.process_response(response)
+            if str(response) != str(input_s):
+                bot.learn_response(response, input_statement)
+                bot.conversation_sessions.update(session_id, statement)
+                bot.output.process_response(response)
 
         except (KeyboardInterrupt, EOFError, SystemExit):
             break
@@ -396,9 +468,12 @@ def loop_trainer(input_s):
 
 
 def word_list_training():
-    ''' take word list
-        train bot word in list for loop amount
-    '''
+    """
+    * word_list contains 5000 most common words in English language
+    * randomize the list
+    * pool 4 child processes
+    * run [loop_trainer(input_s)](#loop_trainerinput_s) with word as input s 
+    """
 
     filename = 'list_5000'
     word_list = open(filename, "r")
@@ -410,11 +485,13 @@ def word_list_training():
     pool.join()
 
 
-def feedback_training():
+def feedback_bot():
     """
-    This example shows how to create a chat bot that
-    will learn responses based on an additional feedback
-    element from the user.
+    * ask for input
+    * present input_statement and response to user
+    * ask if it makes sense
+    * if no, user can fix
+    * train bot
     """
 
     bot = chat_bot()
@@ -424,15 +501,36 @@ def feedback_training():
     while True:
 
         try:
+
             comment = input('input -> ')
             input_statement = bot.input.process_input_statement(comment)
             statement, response = bot.generate_response(input_statement, session_id)
+            print('\n Input -> {} \n'.format(input_statement))
+            print('\n Output -> {} \n'.format(response))
+            print('\n Does this make sense? \n')
 
-            if get_feedback(input_statement, response):
+            text = input_function()
+
+            if 'y' in text.lower():
                 bot.learn_response(response, input_statement)
+                bot.conversation_sessions.update(session_id, statement)
+            elif 'n' in text.lower():
+                print('\n What should my response be? \n')
+                new_response = input_function()
+                print('###############################')
+                print('TODO:')
+                print('* Update response -> {}'.format(new_response))
+                print('* Train bot with new conversation')
+                print('* input -> {}'.format(statement))
+                print('* output -> {}'.format(new_response))
+                print('###############################')
+                # new = bot.output.process_response(new_response)
+                # bot.learn_response(new, input_statement)
                 # bot.conversation_sessions.update(session_id, statement)
+            else:
+                print('Please type either "y" or "n"')
+                return # get_feedback(input_statement, response)
 
-            bot.output.process_response(response)
 
         except (KeyboardInterrupt, EOFError, SystemExit):
             break
@@ -441,10 +539,9 @@ def feedback_training():
 
 
 def hipchat_bot():
-    '''
-    See the HipChat api documentation for how to get a user access token.
-    https://developer.atlassian.com/hipchat/guide/hipchat-rest-api/api-access-tokens
-    '''
+    """
+    DOES NOT WORK YET
+    """
 
     hipchat_host, hipchat_room, hipchat_access_token = get_hipchat_envars()
     print(hipchat_host, hipchat_room, hipchat_access_token)
@@ -473,10 +570,10 @@ def hipchat_bot():
 
 def gitter_bot():
     """
-    Gitter bot
+    * get gitter_room, gitter_api_token from [get_gitter_envars()](#get_gitter_envars)
 
-    https://gitter.im/jahrik/edward
-
+    Talk to bot with twitter or github access
+    * https://gitter.im/jahrik/edward
     """
 
     gitter_room, gitter_api_token = get_gitter_envars()
@@ -506,11 +603,10 @@ def gitter_bot():
 
 
 def voice_bot():
-    '''
-    Voice bot
-    "FileNotFoundError: [Errno 2] No such file or directory: 'jack_control'"
-        https://wiki.archlinux.org/index.php/JACK_Audio_Connection_Kit
-    '''
+    """
+    * input speech to text
+    * output text to speech
+    """
 
     bot = ChatBot(
         "Voice Bot",
@@ -531,35 +627,114 @@ def voice_bot():
         except (KeyboardInterrupt, EOFError, SystemExit):
             break
 
+
+def bot_on_bot():
+    """
+    * make bot talk to another bot.
+    * https://www.tolearnenglish.com/free/celebs/audreyg.php
+    """
+    from urllib import urlencode
+    import requests
+    params = {'search': 'hello'}
+    search_url = 'https://www.tolearnenglish.com/free/celebs/audreyg.php/submit_search/?'
+    url = search_url + urlencode(params)
+    r = requests.get(url)
+    print(r)
+    # now you get your desired response.
+
+
+def bot_sploit():
+    """
+    * Search for other bots on reddit
+    * Talk to the other bots on reddit
+    """
+    
+    return
+
+
+def export(filename=None):
+    """
+    * export the database
+    * mongoexport -d bot_db -c statements
+    """
+    return filename
+    # from os.path import join
+    # import pymongo
+    # from bson.json_utils import dumps
+
+#     def backup_db(backup_db_dir):
+#         client = pymongo.MongoClient(host='mongo', port='27017')
+#         database = client['bot_db']
+#         authenticated = database.authenticate()
+#         assert authenticated, "Could not authenticate to database!"
+#         collections = database.collection_names()
+#         for i, collection_name in enumerate(collections):
+#             col = getattr(database,collections[i])
+#             collection = col.find()
+#             jsonpath = collection_name + ".json"
+#             jsonpath = join(backup_db_dir, jsonpath)
+#             with open(jsonpath, 'wb') as jsonfile:
+#                 jsonfile.write(dumps(collection))
+    # bot = chat_bot()
+    # if filename == None:
+    #     export = 'export.yml'
+    #     bot.trainer.export_for_training(export)
+    # else:
+    #     bot.trainer.export_for_training()
+
+
+def emoji_preprocessor(bot, statement):
+    """
+    * input emojis to chatterbot
+    * http://chatterbot.readthedocs.io/en/stable/preprocessors.html
+    * http://www.unicode.org/emoji/charts/full-emoji-list.html
+    * https://github.com/gunthercox/ChatterBot/issues/911
+    """
+    LOG.debug(bot)
+    LOG.debug(statement)
+    return statement
+
+
 def main():
-    ''' main '''
+    """
+    * check docopt args
+    """
 
-    argument = docopt(__doc__, version=VERSION)
+    args = docopt(__doc__, version=VERSION)
 
-    if '--training' in argument and argument.get('--training'):
-        training = argument.get('--training')
+    if '--bot' in args and args.get('--bot'):
+        bot = args.get('--bot')
+    if '--training' in args and args.get('--training'):
+        training = args.get('--training')
+    if '--export' in args and args.get('--export'):
+        exp = args.get('--export')
+        export(exp)
 
     if training == 'english':
         english_training()
     elif training == 'word_list':
         word_list_training()
-    elif training == 'feedback':
-        feedback_training()
     elif training == 'ubuntu':
         ubuntu_training()
     elif training == 'reddit':
-        reddit_training()
+        reddit_training(sub='all', lim=99)
     elif training == 'twitter':
         twitter_training()
-    elif training == 'hipchat':
+    else:
+        # exit("{0} is not a command. See 'edward.py --help'.".format(training)
+        pass
+
+    if bot == 'feedback':
+        feedback_bot()
+    if bot == 'hipchat':
         hipchat_bot()
-    elif training == 'gitter':
+    elif bot == 'gitter':
         gitter_bot()
-    elif training == 'voice':
+    elif bot == 'voice':
         voice_bot()
     else:
-        LOG.error('Unknown training mode')
-
+        # exit("{0} is not a command. See 'edward.py --help'.".format(bot)
+        pass
 
 if __name__ == '__main__':
 
