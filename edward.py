@@ -719,6 +719,12 @@ def twitter_bot():
         * Listener for handling direct messaging input
         """
 
+        def __init__(self, api=None):
+            self.api = api
+            self.bot = chat_bot()
+            self.session = self.bot.conversation_sessions.new()
+            self.session_id = self.session.id
+
         def on_connect(self):
             LOG.info("Connection established!")
 
@@ -730,19 +736,22 @@ def twitter_bot():
             return True
 
         def on_data(self, data):
-            from tweepy.models import Status
             import json
             from pprint import pprint
             LOG.info('Entered on data')
-
             if 'direct_message' in data:
-                # status = Status.parse(self.api, data)
-                # LOG.info(data)
                 parsed = json.loads(data)
-                # pprint(parsed)
-                pprint(parsed["direct_message"]["text"])
-                # if self.on_direct_message(status) is False:
-                    # return False
+                sender_id = parsed["direct_message"]["sender_id"]
+                sender_name = parsed["direct_message"]["sender_screen_name"]
+                comment = parsed["direct_message"]["text"]
+                LOG.info('Message Received from: %s', sender_name)
+                LOG.info('Message: %s', comment)
+                if int(api.me().id) != int(sender_id):
+                    input_statement = self.bot.input.process_input_statement(comment)
+                    statement, response = self.bot.generate_response(input_statement, self.session_id)
+                    api.send_direct_message(sender_name, text=response)
+                    self.bot.learn_response(response, input_statement)
+                    self.bot.conversation_sessions.update(self.session_id, statement)
 
             return True
 
@@ -853,9 +862,6 @@ def twitter_bot():
 #    for follower in limit_handled(tweepy.Cursor(api.followers).items()):
 #        if follower.friends_count < 300:
 #            print(follower.screen_name)
-
-
-
 
 
 def main():
