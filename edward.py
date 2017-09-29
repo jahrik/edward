@@ -32,10 +32,13 @@ from time import sleep
 import multiprocessing
 from docopt import docopt
 import praw
+import tweepy
 from chatterbot import ChatBot
 from chatterbot.utils import input_function
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot.trainers import UbuntuCorpusTrainer
+from tweepy import Stream, OAuthHandler
+from tweepy.streaming import StreamListener
 
 VERSION = '0.1.1'
 
@@ -118,6 +121,7 @@ def get_twitter_envars():
     """
     * get Twitter creds from envars
     * return twitter_key, twitter_secret, twitter_token, twitter_token_secret
+    * create app https://apps.twitter.com/
     """
 
     if os.environ.get('TWITTER_KEY') is None:
@@ -695,6 +699,165 @@ def emoji_preprocessor(bot, statement):
     return statement
 
 
+def facebook_messenger_bot():
+    """
+    * Connect to facebook messenger
+    * API key?: 
+    """
+
+
+def twitter_bot():
+    """
+    * post to twitter
+    * reply to posts
+    * learn allthethings
+    """
+
+    class BotStreamListener(StreamListener):
+        """
+        * A listener handles tweets that are received from the stream.
+        * Listener for handling direct messaging input
+        """
+
+        def on_connect(self):
+            LOG.info("Connection established!")
+
+        def on_disconnect(self, notice):
+            LOG.info("Connection lost!! : %s", notice)
+
+        def on_status(self, status):
+            LOG.info(status.text)
+            return True
+
+        def on_data(self, data):
+            from tweepy.models import Status
+            import json
+            from pprint import pprint
+            LOG.info('Entered on data')
+
+            if 'direct_message' in data:
+                # status = Status.parse(self.api, data)
+                # LOG.info(data)
+                parsed = json.loads(data)
+                # pprint(parsed)
+                pprint(parsed["direct_message"]["text"])
+                # if self.on_direct_message(status) is False:
+                    # return False
+
+            return True
+
+        def on_error(self, status):
+            print(status)
+
+        
+        
+    def limit_handled(cursor):
+        """
+        * Rate limit handler for twitter
+        * sleep for 60 seconds
+        """
+
+        while True:
+            try:
+                yield cursor.next()
+            except tweepy.RateLimitError:
+                sleep(60 * 1)
+
+    def twitter_search(search, limit):
+        """
+        Search twitter for x
+        """
+        search_results = ()
+        for tweet in tweepy.Cursor(api.search, q='#{}'.format(search)).items():
+            try:
+               print('Tweet by: @' + tweet.user.screen_name)
+               sleep(5)
+
+            except tweepy.TweepError as e:
+                print(e.reason)
+
+            except StopIteration:
+                break
+        return search_results
+
+
+    def twitter_retweet(search, limit):
+        """
+        * twitter_search(search)
+        * retweet the things
+        * limit how many
+        """
+        search_results = twitter_search(search, 3)
+        for tweet in search_resulsts:
+            try:
+                tweet.retweet()
+            except tweepy.TweepError as e:
+                LOG.error(e.reason)
+                sleep(5)
+
+        return
+
+
+    twitter_key, twitter_secret, twitter_token, twitter_token_secret = get_twitter_envars()
+
+    auth = tweepy.OAuthHandler(twitter_key, twitter_secret)
+    auth.set_access_token(twitter_token, twitter_token_secret)
+    api = tweepy.API(auth)
+    LOG.info('Accessing API as: %s', api.me().name)
+
+    try:
+        # follow every follower of the authenticated user.
+        for follower in limit_handled(tweepy.Cursor(api.followers).items()):
+            if follower.friends_count < 300:
+                LOG.info('Follower: %s', follower.screen_name)
+                follower.follow()
+
+        LOG.info("Starting bot_stream for %s", api.me().name)
+        bot_stream_listener = BotStreamListener()
+        stream = tweepy.Stream(auth = api.auth, listener = bot_stream_listener)
+        # stream.filter(track=['bot'], async=True)
+        # stream.filter(track=['bot'])
+        stream.userstream()
+
+    except BaseException as e:
+        LOG.error("Twitter Bot Error: %s", e)
+
+
+#    # Print timeline
+#    for tweet in limit_handled(tweepy.Cursor(api.home_timeline).items()):
+#        print(tweet.text)
+#
+#    # Print messages
+#    messages = api.direct_messages()
+#    print(messages)
+#
+#    for status in tweepy.Cursor(api.home_timeline()).items():
+#        # process status here
+#        print(status)
+#
+#    search = 'cat'
+#    limit = 3
+#    # twitter_retweet(search, limit)
+
+    # Iterate through all of the authenticated user's friends
+#    for friend in tweepy.Cursor(api.friends).items():
+#        # Process the friend here
+#        process_friend(friend)
+#
+#    # Iterate through the first 200 statuses in the friends timeline
+#    for status in tweepy.Cursor(api.friends_timeline).items(200):
+#        # Process the status here
+#        process_status(status)
+
+#
+#    for follower in limit_handled(tweepy.Cursor(api.followers).items()):
+#        if follower.friends_count < 300:
+#            print(follower.screen_name)
+
+
+
+
+
 def main():
     """
     * check docopt args
@@ -730,6 +893,8 @@ def main():
         hipchat_bot()
     elif bot == 'gitter':
         gitter_bot()
+    elif bot == 'twitter':
+        twitter_bot()
     elif bot == 'voice':
         voice_bot()
     else:
@@ -741,3 +906,4 @@ if __name__ == '__main__':
     LOG = logging_setup()
 
     main()
+
