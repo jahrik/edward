@@ -708,9 +708,13 @@ def facebook_messenger_bot():
 
 def twitter_bot():
     """
-    * post to twitter
-    * reply to posts
-    * learn allthethings
+    * Create a BotStreamListener(StreamListener) class
+    * see details here: [class StreamListener(object):](https://github.com/tweepy/tweepy/blob/8373a0ab040461531c26076693cc99ecd2a7c3f1/tweepy/streaming.py#L31)
+    * Start up bot on __init__()
+    * watch for data
+    * if 'direct_message' and not our user_id:
+    * process a response for the message from the database
+    * reply with response
     """
 
     class BotStreamListener(StreamListener):
