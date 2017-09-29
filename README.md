@@ -34,6 +34,7 @@ export GITTER_API_TOKEN=
         * [emoji_preprocessor(bot, statement)](#emoji_preprocessorbot-statement)
         * [english_training()](#english_training)
         * [export(filename=None)](#exportfilenamenone)
+        * [facebook_messenger_bot()](#facebook_messenger_bot)
         * [feedback_bot()](#feedback_bot)
         * [get_gitter_envars()](#get_gitter_envars)
         * [get_hipchat_envars()](#get_hipchat_envars)
@@ -47,6 +48,7 @@ export GITTER_API_TOKEN=
         * [loop_trainer(input_s)](#loop_trainerinput_s)
         * [main()](#main)
         * [reddit_training(sub, lim)](#reddit_trainingsub-lim)
+        * [twitter_bot()](#twitter_bot)
         * [twitter_training()](#twitter_training)
         * [ubuntu_training()](#ubuntu_training)
         * [voice_bot()](#voice_bot)
@@ -124,6 +126,11 @@ qyio6ac50xyt        edward_bot          replicated          1/1                 
 * export the database
 * mongoexport -d bot_db -c statements
 
+#### `facebook_messenger_bot()`
+
+* Connect to facebook messenger
+* API key?: 
+
 #### `feedback_bot()`
 
 * ask for input
@@ -135,14 +142,14 @@ qyio6ac50xyt        edward_bot          replicated          1/1                 
 #### `get_gitter_envars()`
 
 * get Gitter room and api token from envars
-* you can obtain an api token at:
+* obtain an api token at:
 * https://developer.gitter.im/apps
 * return gitter_room, gitter_api_token
 
 #### `get_hipchat_envars()`
 
 * get HipChat host, room, and api token from envars
-* you can obtain an api token at:
+* obtain an api token at:
 * https://hipchat.com/admin/api
 * return hipchat_host, hipchat_room, hipchat_access_token
 
@@ -167,6 +174,7 @@ qyio6ac50xyt        edward_bot          replicated          1/1                 
 
 * get Twitter creds from envars
 * return twitter_key, twitter_secret, twitter_token, twitter_token_secret
+* create app https://apps.twitter.com/
 
 #### `gitter_bot()`
 
@@ -227,6 +235,12 @@ Training
 * if reply is < 80 characters
 * append training list
 * Train the bot
+
+#### `twitter_bot()`
+
+* post to twitter
+* reply to posts
+* learn allthethings
 
 #### `twitter_training()`
 
