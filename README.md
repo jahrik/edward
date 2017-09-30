@@ -28,6 +28,13 @@ export GITTER_API_TOKEN=
     * [Usage](#usage)
     * [Docker](#docker)
     * [Module defs](#module-defs)
+GitHub TOC generator (gh-md-toc): 0.4.8
+
+Usage:
+  gh-md-toc src [src]     Create TOC for a README file (url or local path)
+  gh-md-toc -             Create TOC for markdown from STDIN
+  gh-md-toc --help        Show help
+  gh-md-toc --version     Show version
         * [bot_on_bot()](#bot_on_bot)
         * [bot_sploit()](#bot_sploit)
         * [chat_bot()](#chat_bot)
@@ -269,3 +276,8 @@ Train bot using data from Twitter.
 * randomize the list
 * pool 4 child processes
 * run [loop_trainer(input_s)](#loop_trainerinput_s) with word as input s 
+## TODO
+* Rate limiting fixes
+  * https://github.com/SerpentAI/requests-respectful
+* stuff
+* things
