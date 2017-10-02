@@ -28,7 +28,6 @@ export GITTER_API_TOKEN=
     * [Usage](#usage)
     * [Docker](#docker)
     * [Module defs](#module-defs)
-    * [TODO](#todo)
         * [bot_on_bot()](#bot_on_bot)
         * [bot_sploit()](#bot_sploit)
         * [chat_bot()](#chat_bot)
@@ -55,6 +54,7 @@ export GITTER_API_TOKEN=
         * [ubuntu_training()](#ubuntu_training)
         * [voice_bot()](#voice_bot)
         * [word_list_training()](#word_list_training)
+    * [TODO](#todo)
 ## Usage
 ```
 Usage:
