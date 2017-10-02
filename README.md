@@ -42,6 +42,7 @@ Usage:
         * [english_training()](#english_training)
         * [export(filename=None)](#exportfilenamenone)
         * [facebook_messenger_bot()](#facebook_messenger_bot)
+        * [feedback(bot, comment)](#feedbackbot-comment)
         * [feedback_bot()](#feedback_bot)
         * [get_gitter_envars()](#get_gitter_envars)
         * [get_hipchat_envars()](#get_hipchat_envars)
@@ -137,6 +138,11 @@ qyio6ac50xyt        edward_bot          replicated          1/1                 
 
 * Connect to facebook messenger
 * API key?: 
+
+#### `feedback(bot, comment)`
+
+* parse comment for Master commands
+* return response
 
 #### `feedback_bot()`
 
