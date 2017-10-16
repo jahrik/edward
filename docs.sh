@@ -34,6 +34,7 @@ echo '## Usage' | toc - >> README.md
 echo '## Docker' | toc - >> README.md
 echo '## Module defs' | toc - >> README.md
 myopts edward.py | toc - >> README.md
+echo '## TODO' | toc - >> README.md
 
 # Generate Usage docs
 echo '## Usage' >> README.md
@@ -63,3 +64,11 @@ EOF
 # Generate Module defs docs
 echo '## Module defs' >> README.md
 myopts edward.py >> README.md
+
+echo '## TODO' >> README.md
+cat << EOF >> README.md
+* Rate limiting fixes
+  * https://github.com/SerpentAI/requests-respectful
+* pytest
+* stack overflow
+EOF
