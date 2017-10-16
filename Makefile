@@ -3,13 +3,16 @@ VERSION = "0.1.1"
 all: build
 
 build:
-	@docker build -t bot:$(VERSION) -t bot:latest .
+	@docker build -t wgill/bot:$(VERSION) -t wgill/bot:latest .
+
+push: build
+	@docker push wgill/bot:latest
 
 test: build
 	@docker-compose down
 	@docker-compose up -d
 
-deploy: build
+deploy: build, push
 	@docker stack deploy -c docker-compose-stack.yml edward
 
 destroy:
