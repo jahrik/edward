@@ -2,17 +2,13 @@ version: '2'
 
 services:
   gitter_bot:
-    image: bot:latest
+    image: wgill/bot:latest
     container_name: "gitter_bot"
     environment:
       - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
       - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}
       - REDDIT_USERNAME=${REDDIT_USERNAME}
       - REDDIT_PASSWORD=${REDDIT_PASSWORD}
-      - TWITTER_KEY=${TWITTER_KEY}
-      - TWITTER_SECRET=${TWITTER_SECRET}
-      - TWITTER_TOKEN=${TWITTER_TOKEN}
-      - TWITTER_TOKEN_SECRET=${TWITTER_TOKEN_SECRET}
       - HIPCHAT_HOST=${HIPCHAT_HOST}
       - HIPCHAT_ROOM=${HIPCHAT_ROOM}
       - HIPCHAT_ACCESS_TOKEN=${HIPCHAT_ACCESS_TOKEN}
@@ -25,7 +21,7 @@ services:
     command: python3 edward.py -b gitter
 
   twitter_bot:
-    image: bot:latest
+    image: wgill/bot:latest
     container_name: "twitter_bot"
     environment:
       - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
@@ -36,11 +32,6 @@ services:
       - TWITTER_SECRET=${TWITTER_SECRET}
       - TWITTER_TOKEN=${TWITTER_TOKEN}
       - TWITTER_TOKEN_SECRET=${TWITTER_TOKEN_SECRET}
-      - HIPCHAT_HOST=${HIPCHAT_HOST}
-      - HIPCHAT_ROOM=${HIPCHAT_ROOM}
-      - HIPCHAT_ACCESS_TOKEN=${HIPCHAT_ACCESS_TOKEN}
-      - GITTER_ROOM=${GITTER_ROOM}
-      - GITTER_API_TOKEN=${GITTER_API_TOKEN}
     links:
       - mongo
     depends_on:
@@ -57,4 +48,7 @@ services:
       - ./data/db:/data/db
     ports:
       - 27017:27017
+    # /sys/kernel/mm/transparent_hugepage/enabled is 'never'
+    # /sys/kernel/mm/transparent_hugepage/defrag is 'never'
+    # command: numactl --interleave=all mongod
     command: mongod

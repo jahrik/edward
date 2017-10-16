@@ -2,7 +2,7 @@ version: '3'
 
 services:
   bot:
-    image: bot:latest
+    image: wgill/bot:latest
     environment:
       - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
       - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}
