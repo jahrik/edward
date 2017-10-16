@@ -201,7 +201,7 @@ def get_reddit():
 
         reddit = praw.Reddit(client_id=client_id,
                              client_secret=client_secret,
-                             user_agent='uselessbots:v0.0.1 (by /u/uselessbots)',
+                             user_agent='edward:v0.1.1 (by /u/uselessbots)',
                              username=username,
                              password=password)
 
@@ -257,7 +257,9 @@ def chat_bot():
             #   'import_path': 'chatterbot.logic.TimeLogicAdapter'
             # }
         ],
-
+        # filters=[
+        #     'chatterbot.filters.RepetitiveResponseFilter'
+        # ],
         trainer='chatterbot.trainers.ListTrainer'
 
         )
@@ -376,12 +378,14 @@ def reddit_training(sub, lim):
                     sub_comments.append(comment.body)
                     for _idx, rep in enumerate(comment.replies):
                         reply = rep.body.strip('/r/').strip('^')
+                        # if comment is > 80:
+                        #   find portion of comment that is valid and snip
                         if len(reply) < 80:
                             if not reply == '[removed]':
                                 LOG.debug('Appending reply: %s', reply)
                                 sub_comments.append(reply)
                         else:
-                            LOG.debug('Reply is too long')
+                            LOG.debug('Reply is too long: {}'.format(reply))
 
                     # If comment chain is at least 5 long train bot.
                     if len(sub_comments) < 5:
@@ -529,8 +533,12 @@ def feedback_bot():
                 print('* output -> {}'.format(new_response))
                 print('###############################')
                 # new = bot.output.process_response(new_response)
-                # bot.learn_response(new, input_statement)
+                # bot.learn_response(new_response, input_statement)
                 # bot.conversation_sessions.update(session_id, statement)
+                chain = []
+                chain.append(statement.text)
+                chain.append(new_response)
+                bot.train(chain)
             else:
                 print('Please type either "y" or "n"')
                 return # get_feedback(input_statement, response)
@@ -637,13 +645,13 @@ def bot_on_bot():
     * make bot talk to another bot.
     * https://www.tolearnenglish.com/free/celebs/audreyg.php
     """
-    from urllib import urlencode
-    import requests
-    params = {'search': 'hello'}
-    search_url = 'https://www.tolearnenglish.com/free/celebs/audreyg.php/submit_search/?'
-    url = search_url + urlencode(params)
-    r = requests.get(url)
-    print(r)
+    # from urllib import urlencode
+    # import requests
+    # params = {'search': 'hello'}
+    # search_url = 'https://www.tolearnenglish.com/free/celebs/audreyg.php/submit_search/?'
+    # url = search_url + urlencode(params)
+    # r = requests.get(url)
+    # print(r)
     # now you get your desired response.
 
 
@@ -652,7 +660,6 @@ def bot_sploit():
     * Search for other bots on reddit
     * Talk to the other bots on reddit
     """
-    
     return
 
 
@@ -661,30 +668,36 @@ def export(filename=None):
     * export the database
     * mongoexport -d bot_db -c statements
     """
-    return filename
+    # return filename
     # from os.path import join
-    # import pymongo
+    import pymongo
     # from bson.json_utils import dumps
+    username = 'root'
+    password = 'root'
+    host = 'mongodb://{}:{}@127.0.0.1'.format(username, password)
+    port = 27017
+    database = 'bot_db'
 
-#     def backup_db(backup_db_dir):
-#         client = pymongo.MongoClient(host='mongo', port='27017')
-#         database = client['bot_db']
-#         authenticated = database.authenticate()
-#         assert authenticated, "Could not authenticate to database!"
-#         collections = database.collection_names()
-#         for i, collection_name in enumerate(collections):
-#             col = getattr(database,collections[i])
-#             collection = col.find()
-#             jsonpath = collection_name + ".json"
-#             jsonpath = join(backup_db_dir, jsonpath)
-#             with open(jsonpath, 'wb') as jsonfile:
-#                 jsonfile.write(dumps(collection))
+    def backup_db(backup_db_dir):
+        client = pymongo.MongoClient(host=host, port=port)
+        database = client['bot_db']
+        print(authenticated = database.authenticate())
+        assert authenticated, "Could not authenticate to database!"
+        print(collections)
+        collections = database.collection_names()
+        # for i, collection_name in enumerate(collections):
+            # col = getattr(database,collections[i])
+            # collection = col.find()
+            # jsonpath = collection_name + ".json"
+            # jsonpath = join(backup_db_dir, jsonpath)
+            # with open(jsonpath, 'wb') as jsonfile:
+                # jsonfile.write(dumps(collection))
     # bot = chat_bot()
+    backup_db(backup_db_dir=os.environ['PWD'])
     # if filename == None:
-    #     export = 'export.yml'
-    #     bot.trainer.export_for_training(export)
+        # export = 'export.yml'
     # else:
-    #     bot.trainer.export_for_training()
+        # backup_db(backup_db_dir=os.environ['PWD'])
 
 
 def emoji_preprocessor(bot, statement):
@@ -706,6 +719,22 @@ def facebook_messenger_bot():
     """
 
 
+def feedback(bot, comment):
+    """
+    * parse comment for Master commands
+    * return response
+    """
+
+    # from chatterbot.storage.mongodb import MongoDatabaseAdapter as MDA
+    if 'Delete ' in comment:
+        delete_this = comment.split("Delete ",1)[1]
+        LOG.info('Deleting: %s', delete_this)
+        return True
+        bot.storage.mongodb.MongoDatabaseAdapter.remove(statement_text=delete_this)
+    else:
+        return False
+
+
 def twitter_bot():
     """
     * Create a BotStreamListener(StreamListener) class
@@ -719,7 +748,7 @@ def twitter_bot():
 
     class BotStreamListener(StreamListener):
         """
-        * A listener handles tweets that are received from the stream.
+        * A listener handles private messages that are received from the stream.
         * Listener for handling direct messaging input
         """
 
@@ -741,7 +770,6 @@ def twitter_bot():
 
         def on_data(self, data):
             import json
-            from pprint import pprint
             LOG.info('Entered on data')
             if 'direct_message' in data:
                 parsed = json.loads(data)
@@ -750,18 +778,20 @@ def twitter_bot():
                 comment = parsed["direct_message"]["text"]
                 LOG.info('Message Received from: %s', sender_name)
                 LOG.info('Message: %s', comment)
-                if int(api.me().id) != int(sender_id):
-                    input_statement = self.bot.input.process_input_statement(comment)
-                    statement, response = self.bot.generate_response(input_statement, self.session_id)
-                    api.send_direct_message(sender_name, text=response)
-                    self.bot.learn_response(response, input_statement)
-                    self.bot.conversation_sessions.update(self.session_id, statement)
+                if feedback(self.bot, comment):
+                    return True
+                else:
+                    if int(api.me().id) != int(sender_id):
+                        input_statement = self.bot.input.process_input_statement(comment)
+                        statement, response = self.bot.generate_response(input_statement, self.session_id)
+                        api.send_direct_message(sender_name, text=response)
+                        self.bot.learn_response(response, input_statement)
+                        self.bot.conversation_sessions.update(self.session_id, statement)
 
             return True
 
         def on_error(self, status):
             print(status)
-
         
         
     def limit_handled(cursor):
@@ -821,51 +851,16 @@ def twitter_bot():
     try:
         # follow every follower of the authenticated user.
         for follower in limit_handled(tweepy.Cursor(api.followers).items()):
-            if follower.friends_count < 300:
-                LOG.info('Follower: %s', follower.screen_name)
-                follower.follow()
+            LOG.info('Follower: %s', follower.screen_name)
+            follower.follow()
 
         LOG.info("Starting bot_stream for %s", api.me().name)
         bot_stream_listener = BotStreamListener()
-        stream = tweepy.Stream(auth = api.auth, listener = bot_stream_listener)
-        # stream.filter(track=['bot'], async=True)
-        # stream.filter(track=['bot'])
+        stream = tweepy.Stream(auth=api.auth, listener=bot_stream_listener)
         stream.userstream()
 
-    except BaseException as e:
-        LOG.error("Twitter Bot Error: %s", e)
-
-
-#    # Print timeline
-#    for tweet in limit_handled(tweepy.Cursor(api.home_timeline).items()):
-#        print(tweet.text)
-#
-#    # Print messages
-#    messages = api.direct_messages()
-#    print(messages)
-#
-#    for status in tweepy.Cursor(api.home_timeline()).items():
-#        # process status here
-#        print(status)
-#
-#    search = 'cat'
-#    limit = 3
-#    # twitter_retweet(search, limit)
-
-    # Iterate through all of the authenticated user's friends
-#    for friend in tweepy.Cursor(api.friends).items():
-#        # Process the friend here
-#        process_friend(friend)
-#
-#    # Iterate through the first 200 statuses in the friends timeline
-#    for status in tweepy.Cursor(api.friends_timeline).items(200):
-#        # Process the status here
-#        process_status(status)
-
-#
-#    for follower in limit_handled(tweepy.Cursor(api.followers).items()):
-#        if follower.friends_count < 300:
-#            print(follower.screen_name)
+    except BaseException as err:
+        LOG.error("Twitter Bot Error: %s", err)
 
 
 def main():
@@ -916,4 +911,3 @@ if __name__ == '__main__':
     LOG = logging_setup()
 
     main()
-
