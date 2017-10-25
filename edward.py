@@ -28,6 +28,7 @@ import sys
 import random
 import logging
 from logging import StreamHandler
+import time
 from time import sleep
 import multiprocessing
 from docopt import docopt
@@ -663,41 +664,45 @@ def bot_sploit():
     return
 
 
-def export(filename=None):
-    """
-    * export the database
-    * mongoexport -d bot_db -c statements
-    """
-    # return filename
-    # from os.path import join
-    import pymongo
-    # from bson.json_utils import dumps
-    username = 'root'
-    password = 'root'
-    host = 'mongodb://{}:{}@127.0.0.1'.format(username, password)
-    port = 27017
-    database = 'bot_db'
-
-    def backup_db(backup_db_dir):
-        client = pymongo.MongoClient(host=host, port=port)
-        database = client['bot_db']
-        print(authenticated = database.authenticate())
-        assert authenticated, "Could not authenticate to database!"
-        print(collections)
-        collections = database.collection_names()
-        # for i, collection_name in enumerate(collections):
-            # col = getattr(database,collections[i])
-            # collection = col.find()
-            # jsonpath = collection_name + ".json"
-            # jsonpath = join(backup_db_dir, jsonpath)
-            # with open(jsonpath, 'wb') as jsonfile:
-                # jsonfile.write(dumps(collection))
-    # bot = chat_bot()
-    backup_db(backup_db_dir=os.environ['PWD'])
-    # if filename == None:
-        # export = 'export.yml'
-    # else:
-        # backup_db(backup_db_dir=os.environ['PWD'])
+# def export(filename=None):
+#     """
+#     * export the database
+#     * mongoexport -d bot_db -c statements
+#     """
+#     # return filename
+#     # from os.path import join
+#     import pymongo
+#     # from bson.json_utils import dumps
+#     username = 'root'
+#     password = 'root'
+#     host = 'mongodb://{}:{}@127.0.0.1'.format(username, password)
+#     port = 27017
+#     database = 'bot_db'
+#
+#     def backup_db(backup_db_dir):
+#         """
+#         backup mongo db
+#         """
+#         pass
+#         # client = pymongo.MongoClient(host=host, port=port)
+#         # database = client['bot_db']
+#         # print(authenticated = database.authenticate())
+#         # assert authenticated, "Could not authenticate to database!"
+#         # print(collections)
+#         # collections = database.collection_names()
+#         # for i, collection_name in enumerate(collections):
+#             # col = getattr(database,collections[i])
+#             # collection = col.find()
+#             # jsonpath = collection_name + ".json"
+#             # jsonpath = join(backup_db_dir, jsonpath)
+#             # with open(jsonpath, 'wb') as jsonfile:
+#                 # jsonfile.write(dumps(collection))
+#     # bot = chat_bot()
+#     # backup_db(backup_db_dir=os.environ['PWD'])
+#     # if filename == None:
+#         # export = 'export.yml'
+#     # else:
+#         # backup_db(backup_db_dir=os.environ['PWD'])
 
 
 def emoji_preprocessor(bot, statement):
@@ -772,12 +777,6 @@ def twitter_bot():
             import json
             LOG.info('Entered on data')
             
-            # follow every follower of the authenticated user.
-            for follower in limit_handled(tweepy.Cursor(api.followers).items()):
-                LOG.debug('Follower: %s', follower.screen_name)
-                follower.follow()
-
-
             if 'direct_message' in data:
                 parsed = json.loads(data)
                 sender_id = parsed["direct_message"]["sender_id"]
@@ -858,6 +857,32 @@ def twitter_bot():
     api = tweepy.API(auth)
     LOG.info('Accessing API as: %s', api.me().name)
 
+    ############################################################################
+    # Auto follow followers
+    ############################################################################
+
+    def follow_daemon():
+        p = multiprocessing.current_process()
+        LOG.info('Starting:{} {}'.format(p.name, p.pid))
+
+        # follow every follower of the authenticated user.
+        while True:
+            for follower in limit_handled(tweepy.Cursor(api.followers).items()):
+                # LOG.debug('Follower: %s', follower.screen_name)
+                follower.follow()
+                
+            # sys.stdout.flush()
+            time.sleep(60)
+        LOG.info('Exiting: {} {}'.format(p.name, p.pid))
+        # sys.stdout.flush()
+
+    d = multiprocessing.Process(name='follow_daemon', target=follow_daemon)
+    d.daemon = True
+
+    d.start()
+
+    ############################################################################
+
     try:
         LOG.info("Starting bot_stream for %s", api.me().name)
         bot_stream_listener = BotStreamListener()
@@ -893,8 +918,8 @@ def main():
         reddit_training(sub='all', lim=99)
     elif training == 'twitter':
         twitter_training()
-    else:
-        # exit("{0} is not a command. See 'edward.py --help'.".format(training)
+    else: # training:
+        # exit("{0} is not a command. \nSee: './edward.py --help'".format(training))
         pass
 
     if bot == 'feedback':
@@ -907,8 +932,8 @@ def main():
         twitter_bot()
     elif bot == 'voice':
         voice_bot()
-    else:
-        # exit("{0} is not a command. See 'edward.py --help'.".format(bot)
+    else: # bot:
+        # exit("{0} is not a command. \nSee: './edward.py --help'".format(bot))
         pass
 
 if __name__ == '__main__':
