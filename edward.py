@@ -771,6 +771,13 @@ def twitter_bot():
         def on_data(self, data):
             import json
             LOG.info('Entered on data')
+            
+            # follow every follower of the authenticated user.
+            for follower in limit_handled(tweepy.Cursor(api.followers).items()):
+                LOG.debug('Follower: %s', follower.screen_name)
+                follower.follow()
+
+
             if 'direct_message' in data:
                 parsed = json.loads(data)
                 sender_id = parsed["direct_message"]["sender_id"]
@@ -778,9 +785,12 @@ def twitter_bot():
                 comment = parsed["direct_message"]["text"]
                 LOG.info('Message Received from: %s', sender_name)
                 LOG.info('Message: %s', comment)
+
                 if feedback(self.bot, comment):
                     return True
+
                 else:
+
                     if int(api.me().id) != int(sender_id):
                         input_statement = self.bot.input.process_input_statement(comment)
                         statement, response = self.bot.generate_response(input_statement, self.session_id)
@@ -849,11 +859,6 @@ def twitter_bot():
     LOG.info('Accessing API as: %s', api.me().name)
 
     try:
-        # follow every follower of the authenticated user.
-        for follower in limit_handled(tweepy.Cursor(api.followers).items()):
-            LOG.info('Follower: %s', follower.screen_name)
-            follower.follow()
-
         LOG.info("Starting bot_stream for %s", api.me().name)
         bot_stream_listener = BotStreamListener()
         stream = tweepy.Stream(auth=api.auth, listener=bot_stream_listener)
