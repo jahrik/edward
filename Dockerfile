@@ -5,8 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
 # RUN apt-get install -y cron
 
-RUN apt-get install -y jack
-
+# RUN apt-get install -y jack
 # python3_pyaudio deps
 # RUN apt-get install -y \
 #       libasound-dev \
@@ -29,4 +28,4 @@ COPY Makefile /src
 
 RUN pip install -r requirements.txt
 
-CMD ["python3","edward.py","-b","gitter"]
+CMD ["python3","edward.py","-b","twitter"]
