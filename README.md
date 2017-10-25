@@ -33,14 +33,13 @@ export GITTER_API_TOKEN=
         * [chat_bot()](#chat_bot)
         * [emoji_preprocessor(bot, statement)](#emoji_preprocessorbot-statement)
         * [english_training()](#english_training)
-        * [export(filename=None)](#exportfilenamenone)
         * [facebook_messenger_bot()](#facebook_messenger_bot)
-        * [feedback(bot, comment)](#feedbackbot-comment)
         * [feedback_bot()](#feedback_bot)
+        * [feedback(bot, comment)](#feedbackbot-comment)
         * [get_gitter_envars()](#get_gitter_envars)
         * [get_hipchat_envars()](#get_hipchat_envars)
-        * [get_reddit()](#get_reddit)
         * [get_reddit_envars()](#get_reddit_envars)
+        * [get_reddit()](#get_reddit)
         * [get_sub_comments(comment)](#get_sub_commentscomment)
         * [get_twitter_envars()](#get_twitter_envars)
         * [gitter_bot()](#gitter_bot)
@@ -123,20 +122,10 @@ qyio6ac50xyt        edward_bot          replicated          1/1                 
 * train basic english with
 * [chatterbot.corpus.english](https://github.com/gunthercox/chatterbot-corpus/tree/master/chatterbot_corpus/data/english)
 
-#### `export(filename=None)`
-
-* export the database
-* mongoexport -d bot_db -c statements
-
 #### `facebook_messenger_bot()`
 
 * Connect to facebook messenger
 * API key?: 
-
-#### `feedback(bot, comment)`
-
-* parse comment for Master commands
-* return response
 
 #### `feedback_bot()`
 
@@ -145,6 +134,11 @@ qyio6ac50xyt        edward_bot          replicated          1/1                 
 * ask if it makes sense
 * if no, user can fix
 * train bot
+
+#### `feedback(bot, comment)`
+
+* parse comment for Master commands
+* return response
 
 #### `get_gitter_envars()`
 
@@ -160,16 +154,16 @@ qyio6ac50xyt        edward_bot          replicated          1/1                 
 * https://hipchat.com/admin/api
 * return hipchat_host, hipchat_room, hipchat_access_token
 
+#### `get_reddit_envars()`
+
+* get Reddit creds from envars
+* return client_id, client_secret, username, password
+
 #### `get_reddit()`
 
 * obtain client_id, client_secret, username, password from [get_reddit_envars()](#get_reddit_envars)
 * set reddit to praw.Reddit
 * return reddit
-
-#### `get_reddit_envars()`
-
-* get Reddit creds from envars
-* return client_id, client_secret, username, password
 
 #### `get_sub_comments(comment)`
 
@@ -279,5 +273,5 @@ Train bot using data from Twitter.
 ## TODO
 * Rate limiting fixes
   * https://github.com/SerpentAI/requests-respectful
-* stuff
-* things
+* pytest
+* stack overflow
