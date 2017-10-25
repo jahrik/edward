@@ -1,24 +1,36 @@
 version: '3'
 
 services:
-  bot:
+
+  twitter_bot:
     image: wgill/bot:latest
     environment:
-      - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
-      - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}
-      - REDDIT_USERNAME=${REDDIT_USERNAME}
-      - REDDIT_PASSWORD=${REDDIT_PASSWORD}
       - TWITTER_KEY=${TWITTER_KEY}
       - TWITTER_SECRET=${TWITTER_SECRET}
       - TWITTER_TOKEN=${TWITTER_TOKEN}
       - TWITTER_TOKEN_SECRET=${TWITTER_TOKEN_SECRET}
+    depends_on:
+      - mongo
+    command: python3 edward.py -b twitter
+
+  hipchat_bot:
+    image: wgill/bot:latest
+    environment:
       - HIPCHAT_HOST=${HIPCHAT_HOST}
       - HIPCHAT_ROOM=${HIPCHAT_ROOM}
       - HIPCHAT_ACCESS_TOKEN=${HIPCHAT_ACCESS_TOKEN}
+    depends_on:
+      - mongo
+    command: python3 edward.py -b hipchat
+
+  gitter_bot:
+    image: wgill/bot:latest
+    environment:
       - GITTER_ROOM=${GITTER_ROOM}
       - GITTER_API_TOKEN=${GITTER_API_TOKEN}
     depends_on:
       - mongo
+    command: python3 edward.py -b gitter
 
   mongo:
     image: mongo:latest

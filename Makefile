@@ -12,8 +12,8 @@ test: build
 	@docker-compose down
 	@docker-compose up -d
 
-deploy: build, push
-	@docker stack deploy -c docker-compose-stack.yml edward
+deploy: build
+	@docker stack deploy -c docker-stack.yml edward
 
 destroy:
 	@docker stack rm edward
