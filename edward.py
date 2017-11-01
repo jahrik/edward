@@ -806,14 +806,14 @@ def twitter_bot():
     def limit_handled(cursor):
         """
         * Rate limit handler for twitter
-        * sleep for 60 seconds
+        * sleep for a few minutes
         """
 
         while True:
             try:
                 yield cursor.next()
             except tweepy.RateLimitError:
-                sleep(60 * 1)
+                sleep(60 * 3)
 
     def twitter_search(search, limit):
         """
@@ -872,7 +872,7 @@ def twitter_bot():
                 follower.follow()
                 
             # sys.stdout.flush()
-            time.sleep(60)
+            time.sleep(60 * 5)
         LOG.info('Exiting: {} {}'.format(p.name, p.pid))
         # sys.stdout.flush()
 
