@@ -63,3 +63,5 @@ def export(filename=None):
 # Reddit cleanup
 # db.statements.deleteMany( { text: { $regex: /reddit/ } } )
 # db.statements.deleteMany( { text: { $regex: /gold/ } } )
+# db.statements.deleteMany( { text: { $regex: /[removed]/ } } )
+# db.statements.deleteMany( { text: { $regex: /[deleted]/ } } )
