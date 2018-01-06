@@ -22,7 +22,7 @@ RUN apt-get update
 WORKDIR /src
 COPY edward.py /src
 COPY requirements.txt /src
-COPY config /src
+# COPY config /src
 COPY Makefile /src
 # COPY crontab /etc/cron.d/bot_cron
 

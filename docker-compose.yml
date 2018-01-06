@@ -2,7 +2,7 @@ version: '2'
 
 services:
   gitter_bot:
-    image: wgill/bot:latest
+    image: jahrik/bot:latest
     container_name: "gitter_bot"
     environment:
       - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
@@ -21,7 +21,7 @@ services:
     command: python3 edward.py -b gitter
 
   twitter_bot:
-    image: wgill/bot:latest
+    image: jahrik/bot:latest
     container_name: "twitter_bot"
     environment:
       - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}

@@ -3,7 +3,7 @@ version: '3'
 services:
 
   twitter_bot:
-    image: wgill/bot:latest
+    image: jahrik/bot:latest
     environment:
       - TWITTER_KEY=${TWITTER_KEY}
       - TWITTER_SECRET=${TWITTER_SECRET}
@@ -14,7 +14,7 @@ services:
     command: python3 edward.py -b twitter
 
   hipchat_bot:
-    image: wgill/bot:latest
+    image: jahrik/bot:latest
     environment:
       - HIPCHAT_HOST=${HIPCHAT_HOST}
       - HIPCHAT_ROOM=${HIPCHAT_ROOM}
@@ -24,7 +24,7 @@ services:
     command: python3 edward.py -b hipchat
 
   gitter_bot:
-    image: wgill/bot:latest
+    image: jahrik/bot:latest
     environment:
       - GITTER_ROOM=${GITTER_ROOM}
       - GITTER_API_TOKEN=${GITTER_API_TOKEN}

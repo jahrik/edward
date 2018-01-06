@@ -3,10 +3,10 @@ VERSION = "0.1.1"
 all: build
 
 build:
-	@docker build -t wgill/bot:$(VERSION) -t wgill/bot:latest .
+	@docker build -t jahrik/bot:$(VERSION) -t jahrik/bot:latest .
 
 push: build
-	@docker push wgill/bot:latest
+	@docker push jahrik/bot:latest
 
 test: build
 	@docker-compose down
