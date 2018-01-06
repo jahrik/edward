@@ -1,148 +1,279 @@
 # Edward
 
 [![Join the chat at https://gitter.im/jahrik/edward](https://badges.gitter.im/jahrik/edward.svg)](https://gitter.im/jahrik/edward?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-* A small bot that utilizes praw and chatterbot to connect to multiple services
-* [PRAW](https://praw.readthedocs.io/en/latest/)
-* [ChatterBot](https://github.com/gunthercox/ChatterBot)
-* train with:
-  * reddit
-  * twitter
-  * gitter
-  * hipchat
-  * manual feedback
+A small bot that utilizes praw and chatterbot to connect to multiple services
+* chatterbot: https://github.com/gunthercox/ChatterBot
+* PRAW: https://praw.readthedocs.io/en/latest/
 
-## Usage: 
+## Dependencies
+* python 3.5+
+* Be sure to export envars first:
 ```
-./bot.py -h
-    A small bot for learning praw
-
-    Usage:
-        bot.py [-l <level> | --level <level>]
-               [-t <reddit> | --training <reddit>]
-
-    Options:
-        -h --help               Show this screen
-        -l --level=<level>      [default: info]
-        -t --training=<reddit>    Training level [default: reddit]
-
-    Be sure to export envars first:
-        export REDDIT_CLIENT_ID=''
-        export REDDIT_CLIENT_SECRET=''
-        export REDDIT_USERNAME=''
-        export REDDIT_PASSWORD=''
+export REDDIT_CLIENT_ID=
+export REDDIT_CLIENT_SECRET=
+export REDDIT_USERNAME=
+export REDDIT_PASSWORD=
+export TWITTER_KEY=
+export TWITTER_SECRET=
+export TWITTER_TOKEN=
+export TWITTER_TOKEN_SECRET=
+export HIPCHAT_HOST=
+export HIPCHAT_ROOM=
+export HIPCHAT_ACCESS_TOKEN=
+export GITTER_ROOM=
+export GITTER_API_TOKEN=
 ```
 
-### Training mode
-* train your bot!
-* raw input mode
-* bot will ask you how it can help?
-* and carry on a conversation from there
-* will take your response and learn from it
+## TOC
+  * [Edward](#edward)
+    * [Dependencies](#dependencies)
+    * [Usage](#usage)
+    * [Docker](#docker)
+    * [Module defs](#module-defs)
+        * [bot_on_bot()](#bot_on_bot)
+        * [bot_sploit()](#bot_sploit)
+        * [chat_bot()](#chat_bot)
+        * [emoji_preprocessor(bot, statement)](#emoji_preprocessorbot-statement)
+        * [english_training()](#english_training)
+        * [facebook_messenger_bot()](#facebook_messenger_bot)
+        * [feedback_bot()](#feedback_bot)
+        * [feedback(bot, comment)](#feedbackbot-comment)
+        * [get_gitter_envars()](#get_gitter_envars)
+        * [get_hipchat_envars()](#get_hipchat_envars)
+        * [get_reddit_envars()](#get_reddit_envars)
+        * [get_reddit()](#get_reddit)
+        * [get_sub_comments(comment)](#get_sub_commentscomment)
+        * [get_twitter_envars()](#get_twitter_envars)
+        * [gitter_bot()](#gitter_bot)
+        * [hipchat_bot()](#hipchat_bot)
+        * [logging_setup()](#logging_setup)
+        * [loop_trainer(input_s)](#loop_trainerinput_s)
+        * [main()](#main)
+        * [reddit_training(sub, lim)](#reddit_trainingsub-lim)
+        * [twitter_bot()](#twitter_bot)
+        * [twitter_training()](#twitter_training)
+        * [ubuntu_training()](#ubuntu_training)
+        * [voice_bot()](#voice_bot)
+        * [word_list_training()](#word_list_training)
+    * [TODO](#todo)
+## Usage
 ```
-How can I help you?: hello
-...
-2017-09-21 05:13:45.822 INFO bot - bot_training: Comment: hello
-2017-09-21 05:13:45.823 INFO bot - bot_training: Response: hello
-2017-09-21 05:13:45.823 INFO bot - bot_training: Training bot: ['How can I help you?: ', 'hello']
-List Trainer: [####################] 100%
-hello: Good day!
-...
-2017-09-21 05:14:00.166 INFO bot - bot_training: Comment: Good day!
-2017-09-21 05:14:00.166 INFO bot - bot_training: Response: ok :) :)
-2017-09-21 05:14:00.166 INFO bot - bot_training: Training bot: ['hello: ', 'Good day!']
-List Trainer: [####################] 100%
-ok :) :): What are you?
-...
-2017-09-21 05:14:17.346 INFO bot - bot_training: Comment: What are you?
-2017-09-21 05:14:17.346 INFO bot - bot_training: Response: Who? Who is but a form following the function of what
-2017-09-21 05:14:17.346 INFO bot - bot_training: Training bot: ['ok :) :): ', 'What are you?']
-List Trainer: [####################] 100%
-Who? Who is but a form following the function of what:
-...
+Usage:
+    ./edward.py [-l <level> | --level   <level>]
+                [-t  <type> | --training <type>]
+                [-b   <bot> | --bot       <bot>]
+                [-e         | --export   <file>]
+                [-h         | --help           ]
+                [--version  ]
+
+Options:
+    -h --help               Show this screen and exit
+    --version               Show version and exit
+    -l --level=<level>      [default: info]
+    -t --training=<type>    Training type:
+                                english, word_list,
+                                ubuntu, reddit, twitter
+                                [default: None]
+
+    -b --bot=<bot>          Run bot: [default: help]
+                                gitter, hipchat, voice, feedback
+                                [default: None]
+```
+## Docker
+Build and test with docker-compose
+```
+make test
 ```
 
-### Reddit mode
-* Specify a subreddit
-* Specify limit
-* bot will gather entire comment chain from limit of top posts
-* bot will train with comment chain
-* bot will respond to first comment
+Build and deploy to docker swarm
 ```
-./bot.py -t reddit
-2017-09-21 05:29:28.754 INFO bot - chat_bot: Teaching bot basic english...
-ai.yml Training: [####################] 100%
-botprofile.yml Training: [####################] 100%
-computers.yml Training: [####################] 100%
-conversations.yml Training: [####################] 100%
-drugs.yml Training: [####################] 100%
-emotion.yml Training: [####################] 100%
-food.yml Training: [####################] 100%
-gossip.yml Training: [####################] 100%
-greetings.yml Training: [####################] 100%
-history.yml Training: [####################] 100%
-humor.yml Training: [####################] 100%
-literature.yml Training: [####################] 100%
-money.yml Training: [####################] 100%
-movies.yml Training: [####################] 100%
-politics.yml Training: [####################] 100%
-psychology.yml Training: [####################] 100%
-science.yml Training: [####################] 100%
-sports.yml Training: [####################] 100%
-trivia.yml Training: [####################] 100%
-2017-09-21 05:29:39.826 INFO bot - reddit_mode: Read only?: False
-2017-09-21 05:29:44.488 INFO bot - reddit_mode: Title: Guardians of the Front Page
-2017-09-21 05:29:44.490 INFO bot - reddit_mode: Score: 283484
-2017-09-21 05:29:44.490 INFO bot - reddit_mode: ID: 5gn8ru
-2017-09-21 05:29:44.491 INFO bot - reddit_mode: URL: http://i.imgur.com/OOFRJvr.gifv
-2017-09-21 05:29:44.491 INFO bot - reddit_mode: Author: iH8myPP
-2017-09-21 05:29:44.647 INFO bot - reddit_mode: Link karma: 311141
-List Trainer: [####################] 100%
-2017-09-21 05:29:54.001 INFO input_adapter - process_input_statement: Recieved input statement: Remember when the highest upvoted post you saw in a week had 5000 points?
+make deploy
 
-EDIT: For those that are just getting to this post and are confused, when I posted this comment the OP was over 21,000 points. Yes, I know it currently says 11,000 total votes. As many people replied to me, reddit's algorithms fudge the votes in interesting ways to try to keep the front page changing.
-
-EDIT 2: Yes ladies and gents, I know where it's at now. Insane.
-2017-09-21 05:29:54.012 INFO input_adapter - process_input_statement: "Remember when the highest upvoted post you saw in a week had 5000 points?
-
-EDIT: For those that are just getting to this post and are confused, when I posted this comment the OP was over 21,000 points. Yes, I know it currently says 11,000 total votes. As many people replied to me, reddit's algorithms fudge the votes in interesting ways to try to keep the front page changing.
-
-EDIT 2: Yes ladies and gents, I know where it's at now. Insane. " is a known statement
-2017-09-21 05:29:56.195 INFO best_match - process: Using "Remember when the highest upvoted post you saw in a week had 5000 points? EDIT: For those that are just getting to this post and are confused, when I posted this comment the OP was over 21,000 points. Yes, I know it currently says 11,000 total votes. As many people replied to me, reddit's algorithms fudge the votes in interesting ways to try to keep the front page changing. EDIT 2: Yes ladies and gents, I know where it's at now. Insane." as a close match to "Remember when the highest upvoted post you saw in a week had 5000 points?
-
-EDIT: For those that are just getting to this post and are confused, when I posted this comment the OP was over 21,000 points. Yes, I know it currently says 11,000 total votes. As many people replied to me, reddit's algorithms fudge the votes in interesting ways to try to keep the front page changing.
-
-EDIT 2: Yes ladies and gents, I know where it's at now. Insane. "
-2017-09-21 05:29:56.198 INFO best_match - process: Selecting response from 1 optimal responses.
-2017-09-21 05:29:56.198 INFO response_selection - get_first_response: Selecting first response from list of 1 options.
-2017-09-21 05:29:56.198 INFO best_match - process: Response selected. Using "Can't wait to upvote this 17 different times later this week."
-2017-09-21 05:29:56.198 INFO multi_adapter - process: BestMatch selected "Can't wait to upvote this 17 different times later this week." as a response with a confidence of 0.99
-2017-09-21 05:29:58.498 INFO multi_adapter - process: LowConfidenceAdapter selected "I am sorry, but I do not understand." as a response with a confidence of 0
-2017-09-21 05:29:58.500 INFO multi_adapter - process: NoKnowledgeAdapter selected "Remember when the highest upvoted post you saw in a week had 5000 points? EDIT: For those that are just getting to this post and are confused, when I posted this comment the OP was over 21,000 points. Yes, I know it currently says 11,000 total votes. As many people replied to me, reddit's algorithms fudge the votes in interesting ways to try to keep the front page changing. EDIT 2: Yes ladies and gents, I know where it's at now. Insane." as a response with a confidence of 0
-2017-09-21 05:29:58.515 INFO bot - reddit_mode: Comment: Remember when the highest upvoted post you saw in a week had 5000 points?
-
-EDIT: For those that are just getting to this post and are confused, when I posted this comment the OP was over 21,000 points. Yes, I know it currently says 11,000 total votes. As many people replied to me, reddit's algorithms fudge the votes in interesting ways to try to keep the front page changing.
-
-EDIT 2: Yes ladies and gents, I know where it's at now. Insane.
-2017-09-21 05:29:58.515 INFO bot - reddit_mode: Response: Can't wait to upvote this 17 different times later this week.
-2017-09-21 05:29:58.515 INFO bot - reddit_mode: ------------------------------------------------------------
-2017-09-21 05:30:01.518 INFO bot - reddit_mode: Title: Thanks, Obama.
-2017-09-21 05:30:01.519 INFO bot - reddit_mode: Score: 230827
-2017-09-21 05:30:01.519 INFO bot - reddit_mode: ID: 5bx4bx
-2017-09-21 05:30:01.520 INFO bot - reddit_mode: URL: https://i.reddituploads.com/58986555f545487c9d449bd5d9326528?fit=max&h=1536&w=1536&s=c15543d234ef9bbb27cb168b01afb87d
-2017-09-21 05:30:01.520 INFO bot - reddit_mode: Author: Itsjorgehernandez
-2017-09-21 05:30:01.678 INFO bot - reddit_mode: Link karma: 14364
-List Trainer: [####################] 100%
-2017-09-21 05:30:11.891 INFO input_adapter - process_input_statement: Recieved input statement: ^^psst, ^^hey ^^kid, ^^want ^^some ^^[livethread](https://www.reddit.com/live/xw7ya3zdewzc)?
-2017-09-21 05:30:11.895 INFO input_adapter - process_input_statement: "^^psst, ^^hey ^^kid, ^^want ^^some ^^[livethread](https://www.reddit.com/live/xw7ya3zdewzc)?" is a known statement
-2017-09-21 05:30:13.971 INFO best_match - process: Using "^^psst, ^^hey ^^kid, ^^want ^^some ^^[livethread](https://www.reddit.com/live/xw7ya3zdewzc)?" as a close match to "^^psst, ^^hey ^^kid, ^^want ^^some ^^[livethread](https://www.reddit.com/live/xw7ya3zdewzc)?"
-2017-09-21 05:30:13.974 INFO best_match - process: Selecting response from 1 optimal responses.
-2017-09-21 05:30:13.974 INFO response_selection - get_first_response: Selecting first response from list of 1 options.
-2017-09-21 05:30:13.974 INFO best_match - process: Response selected. Using "The president we needed. Now time for the one we deserve."
-2017-09-21 05:30:13.974 INFO multi_adapter - process: BestMatch selected "The president we needed. Now time for the one we deserve." as a response with a confidence of 1.0
-2017-09-21 05:30:15.998 INFO multi_adapter - process: LowConfidenceAdapter selected "I am sorry, but I do not understand." as a response with a confidence of 0
-2017-09-21 05:30:16.000 INFO multi_adapter - process: NoKnowledgeAdapter selected "^^psst, ^^hey ^^kid, ^^want ^^some ^^[livethread](https://www.reddit.com/live/xw7ya3zdewzc)?" as a response with a confidence of 0
-2017-09-21 05:30:16.000 INFO chatterbot - learn_response: Adding "^^psst, ^^hey ^^kid, ^^want ^^some ^^[livethread](https://www.reddit.com/live/xw7ya3zdewzc)?" as a response to "Can't wait to upvote this 17 different times later this week."
-2017-09-21 05:30:16.014 INFO bot - reddit_mode: Comment: ^^psst, ^^hey ^^kid, ^^want ^^some ^^[livethread](https://www.reddit.com/live/xw7ya3zdewzc)?
-2017-09-21 05:30:16.014 INFO bot - reddit_mode: Response: The president we needed. Now time for the one we deserve.
-2017-09-21 05:30:16.014 INFO bot - reddit_mode: ------------------------------------------------------------
+docker stack services edward
+ID                  NAME                MODE                REPLICAS            IMAGE               PORTS
+i3laoiilqi76        edward_mongo        replicated          1/1                 mongo:latest        *:27017->27017/tcp
+qyio6ac50xyt        edward_bot          replicated          1/1                 bot:latest
 ```
+## Module defs
+#### `bot_on_bot()`
+
+* make bot talk to another bot.
+* https://www.tolearnenglish.com/free/celebs/audreyg.php
+
+#### `bot_sploit()`
+
+* Search for other bots on reddit
+* Talk to the other bots on reddit
+
+#### `chat_bot()`
+
+* https://github.com/gunthercox/ChatterBot
+* Create default bot
+* return chatbot
+
+#### `emoji_preprocessor(bot, statement)`
+
+* input emojis to chatterbot
+* http://chatterbot.readthedocs.io/en/stable/preprocessors.html
+* http://www.unicode.org/emoji/charts/full-emoji-list.html
+* https://github.com/gunthercox/ChatterBot/issues/911
+
+#### `english_training()`
+
+* get base bot [chat_bot()](#chat_bot)
+* train basic english with
+* [chatterbot.corpus.english](https://github.com/gunthercox/chatterbot-corpus/tree/master/chatterbot_corpus/data/english)
+
+#### `facebook_messenger_bot()`
+
+* Connect to facebook messenger
+* API key?: 
+
+#### `feedback_bot()`
+
+* ask for input
+* present input_statement and response to user
+* ask if it makes sense
+* if no, user can fix
+* train bot
+
+#### `feedback(bot, comment)`
+
+* parse comment for Master commands
+* return response
+
+#### `get_gitter_envars()`
+
+* get Gitter room and api token from envars
+* obtain an api token at:
+* https://developer.gitter.im/apps
+* return gitter_room, gitter_api_token
+
+#### `get_hipchat_envars()`
+
+* get HipChat host, room, and api token from envars
+* obtain an api token at:
+* https://hipchat.com/admin/api
+* return hipchat_host, hipchat_room, hipchat_access_token
+
+#### `get_reddit_envars()`
+
+* get Reddit creds from envars
+* return client_id, client_secret, username, password
+
+#### `get_reddit()`
+
+* obtain client_id, client_secret, username, password from [get_reddit_envars()](#get_reddit_envars)
+* set reddit to praw.Reddit
+* return reddit
+
+#### `get_sub_comments(comment)`
+
+* get sub comments from a reddit comment object as a list
+* generate a list of sub_comments from all replies
+* return sub_comments
+
+#### `get_twitter_envars()`
+
+* get Twitter creds from envars
+* return twitter_key, twitter_secret, twitter_token, twitter_token_secret
+* create app https://apps.twitter.com/
+
+#### `gitter_bot()`
+
+* get gitter_room, gitter_api_token from [get_gitter_envars()](#get_gitter_envars)
+
+Talk to bot with twitter or github access
+* https://gitter.im/jahrik/edward
+
+#### `hipchat_bot()`
+
+DOES NOT WORK YET
+
+#### `logging_setup()`
+
+* setup logging
+* return logger
+
+#### `loop_trainer(input_s)`
+
+- **`input_s`** `str` `required` `default = None`
+
+   Input string
+
+* input string
+* process as input_statement
+* get statement and response form chat bot
+* if the response is not the same as the input string
+* train bot with conversation
+
+#### `main()`
+
+* check docopt args
+
+#### `reddit_training(sub, lim)`
+
+- **`sub`** `str` `optional` `default = 'all'`
+
+   Which subreddit to use
+
+- **`lim`** `int` `optional` `default = 9`
+
+   how many to grab
+
+Configure
+* get base bot [chat_bot()](#chat_bot)
+* get reddit from [get_reddit()](#get_reddit)
+* configure read only true/false
+* sub = the subreddit to use
+* lim = the amount of submissions to grab from a chosen subreddit
+* slp = is set to keep from reaching reddit server rate limits
+
+Training
+* training list starts as an empty list []
+* for every submission collect comment chains
+* for every comment in comment chains collect all replies
+* if the comment is not '[deleted]'
+* if reply is not '[removed]'
+* if reply is < 80 characters
+* append training list
+* Train the bot
+
+#### `twitter_bot()`
+
+* Create a BotStreamListener(StreamListener) class
+* see details here: [class StreamListener(object):](https://github.com/tweepy/tweepy/blob/8373a0ab040461531c26076693cc99ecd2a7c3f1/tweepy/streaming.py#L31)
+* Start up bot on __init__()
+* watch for data
+* if 'direct_message' and not our user_id:
+* process a response for the message from the database
+* reply with response
+
+#### `twitter_training()`
+
+Train bot using data from Twitter.
+
+#### `ubuntu_training()`
+
+* *THIS IS BROKEN RIGHT NOW*
+* get base bot [chat_bot()](#chat_bot)
+* train with ubuntu corpus
+* [chatterbot.corpus.ubuntu](https://github.com/gunthercox/ChatterBot/blob/b611cbd0629eb2aed9f840b50d1b3f8869c2589e/chatterbot/trainers.py#L236)
+* see [Training with the Ubuntu dialog corpus](http://chatterbot.readthedocs.io/en/stable/training.html#training-with-the-ubuntu-dialog-corpus)
+
+#### `voice_bot()`
+
+* input speech to text
+* output text to speech
+
+#### `word_list_training()`
+
+* word_list contains 5000 most common words in English language
+* randomize the list
+* pool 4 child processes
+* run [loop_trainer(input_s)](#loop_trainerinput_s) with word as input s 
+## TODO
+* Rate limiting fixes
+  * https://github.com/SerpentAI/requests-respectful
+* pytest
+* stack overflow
