@@ -1,0 +1,92 @@
+version: '3'
+
+services:
+
+  mongo:
+    image: mongo:latest
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      # - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+    command: mongod
+    # /sys/kernel/mm/transparent_hugepage/enabled is 'never'
+    # /sys/kernel/mm/transparent_hugepage/defrag is 'never'
+    # command: numactl --interleave=all mongod
+
+#   mongo1:
+#     image: mongo:latest
+#     environment:
+#       - MONGO_DATA_DIR=/data/db
+#       # - MONGO_LOG_DIR=/dev/null
+#     volumes:
+#       # - ./data/db:/data/db
+#       - mongodata1:/data/db
+#       - mongoconfig1:/data/configdb
+#     # ports:
+#       # - 27017:27017
+#     command: mongod --replSet example
+#     deploy:
+#       replicas: 1
+#       labels:
+#         - mongo.replica=1
+#       placement:
+#         constraints:
+#           - node.hostname == localhost
+#           - node.labels.mongo.replica == 1
+#   
+#   mongo2:
+#     image: mongo:latest
+#     environment:
+#       - MONGO_DATA_DIR=/data/db
+#     volumes:
+#       - mongodata2:/data/db
+#       - mongoconfig2:/data/configdb
+#     command: mongod --replSet example
+#     deploy:
+#       replicas: 1
+#       labels:
+#         - mongo.replica=2
+#       placement:
+#         constraints:
+#           - node.hostname == localhost
+#           - node.labels.mongo.replica == 2
+#  
+#   mongo3:
+#     image: mongo:latest
+#     environment:
+#       - MONGO_DATA_DIR=/data/db
+#     volumes:
+#       - mongodata3:/data/db
+#       - mongoconfig3:/data/configdb
+#     command: mongod --replSet example
+#     deploy:
+#       replicas: 1
+#       labels:
+#         - mongo.replica=3
+#       placement:
+#         constraints:
+#           - node.hostname == localhost
+#           - node.labels.mongo.replica == 3
+#  
+# docker network create --driver overlay --internal mongo
+
+#volumes:
+#  mongodata1:
+#  mongoconfig1:
+#  mongodata2:
+#  mongoconfig2:
+#  mongodata3:
+#  mongoconfig3:
+#
+  # docker service inspect --pretty mongo1
+  # docker exec -it $(docker ps -qf label=com.docker.swarm.service.name=mongo1) mongo --eval 'rs.initiate({ _id: "example", members: [{ _id: 1, host: "mongo1:27017" }, { _id: 2, host: "mongo2:27017" }, { _id: 3, host: "mongo3:27017" }], settings: { getLastErrorDefaults: { w: "majority", wtimeout: 30000 }}})'
+  # docker exec -it $(docker ps -qf label=com.docker.swarm.service.name=mongo1) mongo --eval 'rs.status()'
+  # docker exec -it $(docker ps -qf label=com.docker.swarm.service.name=mongo1) mongo --eval 'rs.config()'
+
+
+
+
+
