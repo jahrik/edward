@@ -1,3 +1,4 @@
 config
 *db.sqlite3*
 data/*
+Pipfile*

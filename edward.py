@@ -33,12 +33,12 @@ from time import sleep
 import multiprocessing
 from docopt import docopt
 import praw
-import tweepy
 from chatterbot import ChatBot
-from chatterbot.utils import input_function
+# from chatterbot.utils import input_function
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot.trainers import UbuntuCorpusTrainer
-from tweepy import Stream, OAuthHandler
+# from tweepy import Stream, OAuthHandler
+import tweepy
 from tweepy.streaming import StreamListener
 
 VERSION = '0.1.1'
