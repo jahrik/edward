@@ -35,7 +35,7 @@ from docopt import docopt
 import praw
 from chatterbot import ChatBot
 # from chatterbot.utils import input_function
-from chatterbot.trainers import ChatterBotCorpusTrainer
+from chatterbot.trainers import ChatterBotCorpusTrainer, ListTrainer
 from chatterbot.trainers import UbuntuCorpusTrainer
 # from tweepy import Stream, OAuthHandler
 import tweepy
@@ -236,12 +236,13 @@ def chat_bot():
     * Create default bot
     * return chatbot
     """
+    database = 'chatbot'
 
     chatbot = ChatBot(
         'Default Bot',
         storage_adapter='chatterbot.storage.MongoDatabaseAdapter',
-        database='bot_db',
-        database_uri='mongodb://mongo:27017/',
+        database=f'{database}',
+        database_uri=f'mongodb://rocks:27017/{database}',
         logic_adapters=[
             {
                 'import_path': 'chatterbot.logic.BestMatch'
@@ -277,11 +278,8 @@ def english_training():
 
     LOG.info('Teaching bot basic english...')
     bot = chat_bot()
-
-    bot.set_trainer(ChatterBotCorpusTrainer)
-    bot.train("chatterbot.corpus.english")
-
-    return
+    trainer = ChatterBotCorpusTrainer(bot)
+    trainer.train("chatterbot.corpus.english")
 
 
 def ubuntu_training():
@@ -336,14 +334,9 @@ def reddit_training(sub, lim):
     reddit.read_only = True
     LOG.info('Read only?: %s', reddit.read_only)
 
-    if sub:
-        sub = sub
-    else:
+    if not sub:
         sub = 'all'
-
-    if lim:
-        lim = lim
-    else:
+    if not lim:
         lim = 9
     slp = 0.1
 
@@ -353,7 +346,6 @@ def reddit_training(sub, lim):
         """
         for comment in comments_list:
             print(comment)
-        pass
 
     for submission in reddit.subreddit(sub).hot(limit=lim):
 
@@ -393,7 +385,8 @@ def reddit_training(sub, lim):
                         LOG.debug('Skipping: %s', sub_comments)
                     else:
                         LOG.debug('Comment is %s statements long', len(sub_comments))
-                        bot.train(sub_comments)
+                        trainer = ListTrainer(bot)
+                        trainer.train(sub_comments)
                         LOG.info('Training: %s', sub_comments)
                         LOG.info('--------------------------------------------')
 
