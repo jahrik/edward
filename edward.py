@@ -34,14 +34,16 @@ import multiprocessing
 from docopt import docopt
 import praw
 from chatterbot import ChatBot
+
 # from chatterbot.utils import input_function
 from chatterbot.trainers import ChatterBotCorpusTrainer, ListTrainer
 from chatterbot.trainers import UbuntuCorpusTrainer
+
 # from tweepy import Stream, OAuthHandler
 import tweepy
 from tweepy.streaming import StreamListener
 
-VERSION = '0.1.1'
+VERSION = "0.1.1"
 
 
 def logging_setup():
@@ -50,18 +52,20 @@ def logging_setup():
     * return logger
     """
     argument = docopt(__doc__, version=VERSION)
-    if '--level' in argument and argument.get('--level'):
-        level = getattr(logging, argument.get('--level').upper())
+    if "--level" in argument and argument.get("--level"):
+        level = getattr(logging, argument.get("--level").upper())
     else:
         level = logging.info
     handlers = [StreamHandler()]
 
-    logging.basicConfig(level=level,
-                        format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',
-                        datefmt="%Y-%m-%d %H:%M:%S",
-                        handlers=handlers)
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=handlers,
+    )
 
-    logger = logging.getLogger('prawcore')
+    logger = logging.getLogger("prawcore")
 
     return logger
 
@@ -74,17 +78,17 @@ def get_gitter_envars():
     * return gitter_room, gitter_api_token
     """
 
-    if os.environ.get('GITTER_ROOM') is None:
+    if os.environ.get("GITTER_ROOM") is None:
         LOG.error("export GITTER_ROOM=''")
         sys.exit(1)
     else:
-        gitter_room = os.environ['GITTER_ROOM']
+        gitter_room = os.environ["GITTER_ROOM"]
 
-    if os.environ.get('GITTER_API_TOKEN') is None:
+    if os.environ.get("GITTER_API_TOKEN") is None:
         LOG.error("export GITTER_API_TOKEN=''")
         sys.exit(1)
     else:
-        gitter_api_token = os.environ['GITTER_API_TOKEN']
+        gitter_api_token = os.environ["GITTER_API_TOKEN"]
 
     return gitter_room, gitter_api_token
 
@@ -97,23 +101,23 @@ def get_hipchat_envars():
     * return hipchat_host, hipchat_room, hipchat_access_token
     """
 
-    if os.environ.get('HIPCHAT_HOST') is None:
+    if os.environ.get("HIPCHAT_HOST") is None:
         LOG.error("export HIPCHAT_HOST=''")
         sys.exit(1)
     else:
-        hipchat_host = os.environ['HIPCHAT_HOST']
+        hipchat_host = os.environ["HIPCHAT_HOST"]
 
-    if os.environ.get('HIPCHAT_ROOM') is None:
+    if os.environ.get("HIPCHAT_ROOM") is None:
         LOG.error("export HIPCHAT_ROOM=''")
         sys.exit(1)
     else:
-        hipchat_room = os.environ['HIPCHAT_ROOM']
+        hipchat_room = os.environ["HIPCHAT_ROOM"]
 
-    if os.environ.get('HIPCHAT_ACCESS_TOKEN') is None:
+    if os.environ.get("HIPCHAT_ACCESS_TOKEN") is None:
         LOG.error("export HIPCHAT_ACCESS_TOKEN=''")
         sys.exit(1)
     else:
-        hipchat_access_token = os.environ['HIPCHAT_ACCESS_TOKEN']
+        hipchat_access_token = os.environ["HIPCHAT_ACCESS_TOKEN"]
 
     return hipchat_host, hipchat_room, hipchat_access_token
 
@@ -125,29 +129,29 @@ def get_twitter_envars():
     * create app https://apps.twitter.com/
     """
 
-    if os.environ.get('TWITTER_KEY') is None:
+    if os.environ.get("TWITTER_KEY") is None:
         LOG.error("export TWITTER_KEY=''")
         sys.exit(1)
     else:
-        twitter_key = os.environ['TWITTER_KEY']
+        twitter_key = os.environ["TWITTER_KEY"]
 
-    if os.environ.get('TWITTER_SECRET') is None:
+    if os.environ.get("TWITTER_SECRET") is None:
         LOG.error("export TWITTER_SECRET=''")
         sys.exit(1)
     else:
-        twitter_secret = os.environ['TWITTER_SECRET']
+        twitter_secret = os.environ["TWITTER_SECRET"]
 
-    if os.environ.get('TWITTER_TOKEN') is None:
+    if os.environ.get("TWITTER_TOKEN") is None:
         LOG.error("export TWITTER_TOKEN=''")
         sys.exit(1)
     else:
-        twitter_token = os.environ['TWITTER_TOKEN']
+        twitter_token = os.environ["TWITTER_TOKEN"]
 
-    if os.environ.get('TWITTER_TOKEN_SECRET') is None:
+    if os.environ.get("TWITTER_TOKEN_SECRET") is None:
         LOG.error("export TWITTER_TOKEN_SECRET=''")
         sys.exit(1)
     else:
-        twitter_token_secret = os.environ['TWITTER_TOKEN_SECRET']
+        twitter_token_secret = os.environ["TWITTER_TOKEN_SECRET"]
 
     return twitter_key, twitter_secret, twitter_token, twitter_token_secret
 
@@ -158,29 +162,29 @@ def get_reddit_envars():
     * return client_id, client_secret, username, password
     """
 
-    if os.environ.get('REDDIT_CLIENT_ID') is None:
+    if os.environ.get("REDDIT_CLIENT_ID") is None:
         LOG.error("export REDDIT_CLIENT_ID=''")
         sys.exit(1)
     else:
-        client_id = os.environ['REDDIT_CLIENT_ID']
+        client_id = os.environ["REDDIT_CLIENT_ID"]
 
-    if os.environ.get('REDDIT_CLIENT_SECRET') is None:
+    if os.environ.get("REDDIT_CLIENT_SECRET") is None:
         LOG.error("export REDDIT_CLIENT_SECRET=''")
         sys.exit(1)
     else:
-        client_secret = os.environ['REDDIT_CLIENT_SECRET']
+        client_secret = os.environ["REDDIT_CLIENT_SECRET"]
 
-    if os.environ.get('REDDIT_USERNAME') is None:
+    if os.environ.get("REDDIT_USERNAME") is None:
         LOG.error("export REDDIT_USERNAME=''")
         sys.exit(1)
     else:
-        username = os.environ['REDDIT_USERNAME']
+        username = os.environ["REDDIT_USERNAME"]
 
-    if os.environ.get('REDDIT_PASSWORD') is None:
+    if os.environ.get("REDDIT_PASSWORD") is None:
         LOG.error("export REDDIT_PASSWORD=''")
         sys.exit(1)
     else:
-        password = os.environ['REDDIT_PASSWORD']
+        password = os.environ["REDDIT_PASSWORD"]
 
     return client_id, client_secret, username, password
 
@@ -193,23 +197,25 @@ def get_reddit():
     """
 
     client_id, client_secret, username, password = get_reddit_envars()
-    LOG.debug('%s', client_id)
-    LOG.debug('%s', client_secret)
-    LOG.debug('%s', username)
-    LOG.debug('%s', password)
+    LOG.debug("%s", client_id)
+    LOG.debug("%s", client_secret)
+    LOG.debug("%s", username)
+    LOG.debug("%s", password)
 
     try:
 
-        reddit = praw.Reddit(client_id=client_id,
-                             client_secret=client_secret,
-                             user_agent='edward:v0.1.1 (by /u/uselessbots)',
-                             username=username,
-                             password=password)
+        reddit = praw.Reddit(
+            client_id=client_id,
+            client_secret=client_secret,
+            user_agent="edward:v0.1.1 (by /u/uselessbots)",
+            username=username,
+            password=password,
+        )
 
     except AssertionError as exc:
-        if '429' in '%s' % exc:
-            LOG.warning('Exceeding rate limits: %s', exc)
-            LOG.warning('sleeping for 10 seconds')
+        if "429" in "%s" % exc:
+            LOG.warning("Exceeding rate limits: %s", exc)
+            LOG.warning("sleeping for 10 seconds")
             sleep(10)
 
     return reddit
@@ -236,17 +242,15 @@ def chat_bot():
     * Create default bot
     * return chatbot
     """
-    database = 'chatbot'
+    database = "chatbot"
 
     chatbot = ChatBot(
-        'Default Bot',
-        storage_adapter='chatterbot.storage.MongoDatabaseAdapter',
-        database=f'{database}',
-        database_uri=f'mongodb://rocks:27017/{database}',
+        "Default Bot",
+        storage_adapter="chatterbot.storage.MongoDatabaseAdapter",
+        database=f"{database}",
+        database_uri=f"mongodb://rocks:27017/{database}",
         logic_adapters=[
-            {
-                'import_path': 'chatterbot.logic.BestMatch'
-            }
+            {"import_path": "chatterbot.logic.BestMatch"}
             # {
             #   'import_path': 'chatterbot.logic.LowConfidenceAdapter',
             #   'threshold': 0.65,
@@ -262,9 +266,8 @@ def chat_bot():
         # filters=[
         #     'chatterbot.filters.RepetitiveResponseFilter'
         # ],
-        trainer='chatterbot.trainers.ListTrainer'
-
-        )
+        trainer="chatterbot.trainers.ListTrainer",
+    )
 
     return chatbot
 
@@ -276,7 +279,7 @@ def english_training():
     * [chatterbot.corpus.english](https://github.com/gunthercox/chatterbot-corpus/tree/master/chatterbot_corpus/data/english)
     """
 
-    LOG.info('Teaching bot basic english...')
+    LOG.info("Teaching bot basic english...")
     bot = chat_bot()
     trainer = ChatterBotCorpusTrainer(bot)
     trainer.train("chatterbot.corpus.english")
@@ -291,7 +294,7 @@ def ubuntu_training():
     * see [Training with the Ubuntu dialog corpus](http://chatterbot.readthedocs.io/en/stable/training.html#training-with-the-ubuntu-dialog-corpus)
     """
 
-    LOG.info('Training bot with ubuntu corpus trainer')
+    LOG.info("Training bot with ubuntu corpus trainer")
     bot = chat_bot()
 
     bot.set_trainer(UbuntuCorpusTrainer)
@@ -332,10 +335,10 @@ def reddit_training(sub, lim):
     bot = chat_bot()
     reddit = get_reddit()
     reddit.read_only = True
-    LOG.info('Read only?: %s', reddit.read_only)
+    LOG.info("Read only?: %s", reddit.read_only)
 
     if not sub:
-        sub = 'all'
+        sub = "all"
     if not lim:
         lim = 9
     slp = 0.1
@@ -350,14 +353,14 @@ def reddit_training(sub, lim):
     for submission in reddit.subreddit(sub).hot(limit=lim):
 
         try:
-            LOG.debug('Title: %s', submission.title)
-            LOG.debug('Score: %s', submission.score)
-            LOG.debug('ID: %s', submission.id)
-            LOG.debug('URL: %s', submission.url)
+            LOG.debug("Title: %s", submission.title)
+            LOG.debug("Score: %s", submission.score)
+            LOG.debug("ID: %s", submission.id)
+            LOG.debug("URL: %s", submission.url)
             # If submission.author is NoneType it means the comment was [deleted]
             if submission.author:
-                LOG.debug('Author: %s', submission.author)
-                LOG.debug('Link karma: %s', submission.author.link_karma)
+                LOG.debug("Author: %s", submission.author)
+                LOG.debug("Link karma: %s", submission.author.link_karma)
 
                 # Comments
                 submission.comments.replace_more(limit=0)
@@ -370,39 +373,39 @@ def reddit_training(sub, lim):
                     # sub_comments.append(submission.title)
                     sub_comments.append(comment.body)
                     for _idx, rep in enumerate(comment.replies):
-                        reply = rep.body.strip('/r/').strip('^')
+                        reply = rep.body.strip("/r/").strip("^")
                         # if comment is > 80:
                         #   find portion of comment that is valid and snip
                         if len(reply) < 80:
-                            if not reply == '[removed]':
-                                LOG.debug('Appending reply: %s', reply)
+                            if not reply == "[removed]":
+                                LOG.debug("Appending reply: %s", reply)
                                 sub_comments.append(reply)
                         else:
-                            LOG.debug('Reply is too long: {}'.format(reply))
+                            LOG.debug("Reply is too long: {}".format(reply))
 
                     # If comment chain is at least 5 long train bot.
                     if len(sub_comments) < 5:
-                        LOG.debug('Skipping: %s', sub_comments)
+                        LOG.debug("Skipping: %s", sub_comments)
                     else:
-                        LOG.debug('Comment is %s statements long', len(sub_comments))
+                        LOG.debug("Comment is %s statements long", len(sub_comments))
                         trainer = ListTrainer(bot)
                         trainer.train(sub_comments)
-                        LOG.info('Training: %s', sub_comments)
-                        LOG.info('--------------------------------------------')
+                        LOG.info("Training: %s", sub_comments)
+                        LOG.info("--------------------------------------------")
 
         except praw.exceptions.APIException as praw_exc:
-            LOG.error('APIException: %s', praw_exc)
+            LOG.error("APIException: %s", praw_exc)
 
         except praw.exceptions.ClientException as praw_exc:
-            LOG.error('ClientException: %s', praw_exc)
+            LOG.error("ClientException: %s", praw_exc)
 
         except praw.exceptions.PRAWException as praw_exc:
-            LOG.error('PRAWException: %s', praw_exc)
+            LOG.error("PRAWException: %s", praw_exc)
 
         except AssertionError as exc:
-            if '429' in '%s' % exc:
-                LOG.warning('Exceeding rate limits: %s', exc)
-                LOG.warning('sleeping for 60 seconds')
+            if "429" in "%s" % exc:
+                LOG.warning("Exceeding rate limits: %s", exc)
+                LOG.warning("sleeping for 60 seconds")
                 sleep(60)
 
 
@@ -411,28 +414,31 @@ def twitter_training():
     Train bot using data from Twitter.
     """
 
-    twitter_key, twitter_secret, twitter_token, twitter_token_secret = get_twitter_envars()
+    (
+        twitter_key,
+        twitter_secret,
+        twitter_token,
+        twitter_token_secret,
+    ) = get_twitter_envars()
 
     bot = ChatBot(
-        'Useless Bot',
-        storage_adapter='chatterbot.storage.MongoDatabaseAdapter',
-        database='bot_db',
-        database_uri='mongodb://mongo:27017/',
-        logic_adapters=[
-            "chatterbot.logic.BestMatch"
-        ],
+        "Useless Bot",
+        storage_adapter="chatterbot.storage.MongoDatabaseAdapter",
+        database="bot_db",
+        database_uri="mongodb://mongo:27017/",
+        logic_adapters=["chatterbot.logic.BestMatch"],
         input_adapter="chatterbot.input.TerminalAdapter",
         output_adapter="chatterbot.output.TerminalAdapter",
         twitter_consumer_key=twitter_key,
         twitter_consumer_secret=twitter_secret,
         twitter_access_token_key=twitter_token,
         twitter_access_token_secret=twitter_token_secret,
-        trainer="chatterbot.trainers.TwitterTrainer"
+        trainer="chatterbot.trainers.TwitterTrainer",
     )
 
     bot.train()
 
-    bot.logger.info('Trained database generated successfully!')
+    bot.logger.info("Trained database generated successfully!")
 
 
 def loop_trainer(input_s):
@@ -474,12 +480,12 @@ def word_list_training():
     * word_list contains 5000 most common words in English language
     * randomize the list
     * pool 4 child processes
-    * run [loop_trainer(input_s)](#loop_trainerinput_s) with word as input s 
+    * run [loop_trainer(input_s)](#loop_trainerinput_s) with word as input s
     """
 
-    filename = 'list_5000'
+    filename = "list_5000"
     word_list = open(filename, "r")
-    work = [(line.strip('\n')) for line in word_list]
+    work = [(line.strip("\n")) for line in word_list]
     random.shuffle(work)
     pool = multiprocessing.Pool(4)
     pool.map(loop_trainer, work)
@@ -504,28 +510,28 @@ def feedback_bot():
 
         try:
 
-            comment = input('input -> ')
+            comment = input("input -> ")
             input_statement = bot.input.process_input_statement(comment)
             statement, response = bot.generate_response(input_statement, session_id)
-            print('\n Input -> {} \n'.format(input_statement))
-            print('\n Output -> {} \n'.format(response))
-            print('\n Does this make sense? \n')
+            print("\n Input -> {} \n".format(input_statement))
+            print("\n Output -> {} \n".format(response))
+            print("\n Does this make sense? \n")
 
             text = input_function()
 
-            if 'y' in text.lower():
+            if "y" in text.lower():
                 bot.learn_response(response, input_statement)
                 bot.conversation_sessions.update(session_id, statement)
-            elif 'n' in text.lower():
-                print('\n What should my response be? \n')
+            elif "n" in text.lower():
+                print("\n What should my response be? \n")
                 new_response = input_function()
-                print('###############################')
-                print('TODO:')
-                print('* Update response -> {}'.format(new_response))
-                print('* Train bot with new conversation')
-                print('* input -> {}'.format(statement))
-                print('* output -> {}'.format(new_response))
-                print('###############################')
+                print("###############################")
+                print("TODO:")
+                print("* Update response -> {}".format(new_response))
+                print("* Train bot with new conversation")
+                print("* input -> {}".format(statement))
+                print("* output -> {}".format(new_response))
+                print("###############################")
                 # new = bot.output.process_response(new_response)
                 # bot.learn_response(new_response, input_statement)
                 # bot.conversation_sessions.update(session_id, statement)
@@ -535,8 +541,7 @@ def feedback_bot():
                 bot.train(chain)
             else:
                 print('Please type either "y" or "n"')
-                return # get_feedback(input_statement, response)
-
+                return  # get_feedback(input_statement, response)
 
         except (KeyboardInterrupt, EOFError, SystemExit):
             break
@@ -553,16 +558,16 @@ def hipchat_bot():
     print(hipchat_host, hipchat_room, hipchat_access_token)
 
     bot = ChatBot(
-        'Hipchat Bot',
-        storage_adapter='chatterbot.storage.MongoDatabaseAdapter',
-        database='bot_db',
-        database_uri='mongodb://mongo:27017/',
+        "Hipchat Bot",
+        storage_adapter="chatterbot.storage.MongoDatabaseAdapter",
+        database="bot_db",
+        database_uri="mongodb://mongo:27017/",
         hipchat_host=hipchat_host,
         hipchat_room=hipchat_room,
         hipchat_access_token=hipchat_access_token,
-        input_adapter='chatterbot.input.HipChat',
-        output_adapter='chatterbot.output.HipChat',
-        trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
+        input_adapter="chatterbot.input.HipChat",
+        output_adapter="chatterbot.output.HipChat",
+        trainer="chatterbot.trainers.ChatterBotCorpusTrainer",
     )
 
     while True:
@@ -585,16 +590,16 @@ def gitter_bot():
     gitter_room, gitter_api_token = get_gitter_envars()
 
     bot = ChatBot(
-        'Gitter Bot',
-        storage_adapter='chatterbot.storage.MongoDatabaseAdapter',
-        database='bot_db',
-        database_uri='mongodb://mongo:27017/',
+        "Gitter Bot",
+        storage_adapter="chatterbot.storage.MongoDatabaseAdapter",
+        database="bot_db",
+        database_uri="mongodb://mongo:27017/",
         gitter_room=gitter_room,
         gitter_api_token=gitter_api_token,
         gitter_only_respond_to_mentions=False,
-        input_adapter='chatterbot.input.Gitter',
-        output_adapter='chatterbot.output.Gitter',
-        trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
+        input_adapter="chatterbot.input.Gitter",
+        output_adapter="chatterbot.output.Gitter",
+        trainer="chatterbot.trainers.ChatterBotCorpusTrainer",
     )
 
     while True:
@@ -616,9 +621,9 @@ def voice_bot():
 
     bot = ChatBot(
         "Voice Bot",
-        storage_adapter='chatterbot.storage.MongoDatabaseAdapter',
-        database='bot_db',
-        database_uri='mongodb://mongo:27017/',
+        storage_adapter="chatterbot.storage.MongoDatabaseAdapter",
+        database="bot_db",
+        database_uri="mongodb://mongo:27017/",
         input_adapter="chatterbot_voice.VoiceInput",
         output_adapter="chatterbot_voice.VoiceOutput",
         # recognizer_instance="recognize_google_cloud",
@@ -713,7 +718,7 @@ def emoji_preprocessor(bot, statement):
 def facebook_messenger_bot():
     """
     * Connect to facebook messenger
-    * API key?: 
+    * API key?:
     """
 
 
@@ -724,9 +729,9 @@ def feedback(bot, comment):
     """
 
     # from chatterbot.storage.mongodb import MongoDatabaseAdapter as MDA
-    if 'Delete ' in comment:
-        delete_this = comment.split("Delete ",1)[1]
-        LOG.info('Deleting: %s', delete_this)
+    if "Delete " in comment:
+        delete_this = comment.split("Delete ", 1)[1]
+        LOG.info("Deleting: %s", delete_this)
         return True
         bot.storage.mongodb.MongoDatabaseAdapter.remove(statement_text=delete_this)
     else:
@@ -768,15 +773,16 @@ def twitter_bot():
 
         def on_data(self, data):
             import json
-            LOG.info('Entered on data')
-            
-            if 'direct_message' in data:
+
+            LOG.info("Entered on data")
+
+            if "direct_message" in data:
                 parsed = json.loads(data)
                 sender_id = parsed["direct_message"]["sender_id"]
                 sender_name = parsed["direct_message"]["sender_screen_name"]
                 comment = parsed["direct_message"]["text"]
-                LOG.info('Message Received from: %s', sender_name)
-                LOG.info('Message: %s', comment)
+                LOG.info("Message Received from: %s", sender_name)
+                LOG.info("Message: %s", comment)
 
                 if feedback(self.bot, comment):
                     return True
@@ -784,18 +790,23 @@ def twitter_bot():
                 else:
 
                     if int(api.me().id) != int(sender_id):
-                        input_statement = self.bot.input.process_input_statement(comment)
-                        statement, response = self.bot.generate_response(input_statement, self.session_id)
+                        input_statement = self.bot.input.process_input_statement(
+                            comment
+                        )
+                        statement, response = self.bot.generate_response(
+                            input_statement, self.session_id
+                        )
                         api.send_direct_message(sender_name, text=response)
                         self.bot.learn_response(response, input_statement)
-                        self.bot.conversation_sessions.update(self.session_id, statement)
+                        self.bot.conversation_sessions.update(
+                            self.session_id, statement
+                        )
 
             return True
 
         def on_error(self, status):
             print(status)
-        
-        
+
     def limit_handled(cursor):
         """
         * Rate limit handler for twitter
@@ -813,10 +824,10 @@ def twitter_bot():
         Search twitter for x
         """
         search_results = ()
-        for tweet in tweepy.Cursor(api.search, q='#{}'.format(search)).items():
+        for tweet in tweepy.Cursor(api.search, q="#{}".format(search)).items():
             try:
-               print('Tweet by: @' + tweet.user.screen_name)
-               sleep(5)
+                print("Tweet by: @" + tweet.user.screen_name)
+                sleep(5)
 
             except tweepy.TweepError as e:
                 print(e.reason)
@@ -824,7 +835,6 @@ def twitter_bot():
             except StopIteration:
                 break
         return search_results
-
 
     def twitter_retweet(search, limit):
         """
@@ -842,13 +852,17 @@ def twitter_bot():
 
         return
 
-
-    twitter_key, twitter_secret, twitter_token, twitter_token_secret = get_twitter_envars()
+    (
+        twitter_key,
+        twitter_secret,
+        twitter_token,
+        twitter_token_secret,
+    ) = get_twitter_envars()
 
     auth = tweepy.OAuthHandler(twitter_key, twitter_secret)
     auth.set_access_token(twitter_token, twitter_token_secret)
     api = tweepy.API(auth)
-    LOG.info('Accessing API as: %s', api.me().name)
+    LOG.info("Accessing API as: %s", api.me().name)
 
     ############################################################################
     # Auto follow followers
@@ -856,20 +870,20 @@ def twitter_bot():
 
     def follow_daemon():
         p = multiprocessing.current_process()
-        LOG.info('Starting:{} {}'.format(p.name, p.pid))
+        LOG.info("Starting:{} {}".format(p.name, p.pid))
 
         # follow every follower of the authenticated user.
         while True:
             for follower in limit_handled(tweepy.Cursor(api.followers).items()):
                 # LOG.debug('Follower: %s', follower.screen_name)
                 follower.follow()
-                
+
             # sys.stdout.flush()
             time.sleep(60 * 5)
-        LOG.info('Exiting: {} {}'.format(p.name, p.pid))
+        LOG.info("Exiting: {} {}".format(p.name, p.pid))
         # sys.stdout.flush()
 
-    d = multiprocessing.Process(name='follow_daemon', target=follow_daemon)
+    d = multiprocessing.Process(name="follow_daemon", target=follow_daemon)
     d.daemon = True
 
     d.start()
@@ -893,43 +907,44 @@ def main():
 
     args = docopt(__doc__, version=VERSION)
 
-    if '--bot' in args and args.get('--bot'):
-        bot = args.get('--bot')
-    if '--training' in args and args.get('--training'):
-        training = args.get('--training')
-    if '--export' in args and args.get('--export'):
-        exp = args.get('--export')
+    if "--bot" in args and args.get("--bot"):
+        bot = args.get("--bot")
+    if "--training" in args and args.get("--training"):
+        training = args.get("--training")
+    if "--export" in args and args.get("--export"):
+        exp = args.get("--export")
         export(exp)
 
-    if training == 'english':
+    if training == "english":
         english_training()
-    elif training == 'word_list':
+    elif training == "word_list":
         word_list_training()
-    elif training == 'ubuntu':
+    elif training == "ubuntu":
         ubuntu_training()
-    elif training == 'reddit':
-        reddit_training(sub='all', lim=99)
-    elif training == 'twitter':
+    elif training == "reddit":
+        reddit_training(sub="all", lim=99)
+    elif training == "twitter":
         twitter_training()
-    else: # training:
+    else:  # training:
         # exit("{0} is not a command. \nSee: './edward.py --help'".format(training))
         pass
 
-    if bot == 'feedback':
+    if bot == "feedback":
         feedback_bot()
-    if bot == 'hipchat':
+    if bot == "hipchat":
         hipchat_bot()
-    elif bot == 'gitter':
+    elif bot == "gitter":
         gitter_bot()
-    elif bot == 'twitter':
+    elif bot == "twitter":
         twitter_bot()
-    elif bot == 'voice':
+    elif bot == "voice":
         voice_bot()
-    else: # bot:
+    else:  # bot:
         # exit("{0} is not a command. \nSee: './edward.py --help'".format(bot))
         pass
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 
     LOG = logging_setup()
 
