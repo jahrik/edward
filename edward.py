@@ -20,7 +20,6 @@ Options:
     -b --bot=<bot>          Run bot: [default: help]
                                 gitter, hipchat, voice, feedback
                                 [default: None]
-
 """
 
 import os
@@ -35,7 +34,7 @@ from docopt import docopt
 import praw
 from chatterbot import ChatBot
 
-# from chatterbot.utils import input_function
+from chatterbot.utils import input_function
 from chatterbot.trainers import ChatterBotCorpusTrainer, ListTrainer
 from chatterbot.trainers import UbuntuCorpusTrainer
 
@@ -191,7 +190,8 @@ def get_reddit_envars():
 
 def get_reddit():
     """
-    * obtain client_id, client_secret, username, password from [get_reddit_envars()](#get_reddit_envars)
+    * obtain client_id, client_secret, username, password
+    * from [get_reddit_envars()](#get_reddit_envars)
     * set reddit to praw.Reddit
     * return reddit
     """
@@ -203,7 +203,6 @@ def get_reddit():
     LOG.debug("%s", password)
 
     try:
-
         reddit = praw.Reddit(
             client_id=client_id,
             client_secret=client_secret,
@@ -213,7 +212,7 @@ def get_reddit():
         )
 
     except AssertionError as exc:
-        if "429" in "%s" % exc:
+        if "429" in f"{exc}":
             LOG.warning("Exceeding rate limits: %s", exc)
             LOG.warning("sleeping for 10 seconds")
             sleep(10)
@@ -276,7 +275,9 @@ def english_training():
     """
     * get base bot [chat_bot()](#chat_bot)
     * train basic english with
-    * [chatterbot.corpus.english](https://github.com/gunthercox/chatterbot-corpus/tree/master/chatterbot_corpus/data/english)
+    * [chatterbot.corpus.english]\
+            (https://github.com/gunthercox/chatterbot-\
+            corpus/tree/master/chatterbot_corpus/data/english)
     """
 
     LOG.info("Teaching bot basic english...")
@@ -290,8 +291,12 @@ def ubuntu_training():
     * *THIS IS BROKEN RIGHT NOW*
     * get base bot [chat_bot()](#chat_bot)
     * train with ubuntu corpus
-    * [chatterbot.corpus.ubuntu](https://github.com/gunthercox/ChatterBot/blob/b611cbd0629eb2aed9f840b50d1b3f8869c2589e/chatterbot/trainers.py#L236)
-    * see [Training with the Ubuntu dialog corpus](http://chatterbot.readthedocs.io/en/stable/training.html#training-with-the-ubuntu-dialog-corpus)
+    * [chatterbot.corpus.ubuntu]\
+            (https://github.com/gunthercox/ChatterBot/blob/\
+            b611cbd0629eb2aed9f840b50d1b3f8869c2589e/chatterbot/trainers.py#L236)
+    * see [Training with the Ubuntu dialog corpus]\
+            (http://chatterbot.readthedocs.io/en/stable/training.html#training-
+             with-the-ubuntu-dialog-corpus)
     """
 
     LOG.info("Training bot with ubuntu corpus trainer")
@@ -299,8 +304,6 @@ def ubuntu_training():
 
     bot.set_trainer(UbuntuCorpusTrainer)
     bot.train()
-
-    return
 
 
 def reddit_training(sub, lim):
@@ -343,15 +346,7 @@ def reddit_training(sub, lim):
         lim = 9
     slp = 0.1
 
-    def parse_comments(comments_list):
-        """
-        I must have thought I needed this for something.
-        """
-        for comment in comments_list:
-            print(comment)
-
     for submission in reddit.subreddit(sub).hot(limit=lim):
-
         try:
             LOG.debug("Title: %s", submission.title)
             LOG.debug("Score: %s", submission.score)
@@ -367,7 +362,6 @@ def reddit_training(sub, lim):
                 comments_list = submission.comments.list()
 
                 for comment in comments_list:
-
                     sleep(slp)
                     sub_comments = []
                     # sub_comments.append(submission.title)
@@ -403,7 +397,7 @@ def reddit_training(sub, lim):
             LOG.error("PRAWException: %s", praw_exc)
 
         except AssertionError as exc:
-            if "429" in "%s" % exc:
+            if "429" in f"{exc}":
                 LOG.warning("Exceeding rate limits: %s", exc)
                 LOG.warning("sleeping for 60 seconds")
                 sleep(60)
@@ -460,7 +454,6 @@ def loop_trainer(input_s):
     session_id = session.id
 
     for _var in range(3):
-
         try:
             input_statement = bot.input.process_input_statement(input_s)
             statement, response = bot.generate_response(input_statement, session_id)
@@ -507,9 +500,7 @@ def feedback_bot():
     session_id = session.id
 
     while True:
-
         try:
-
             comment = input("input -> ")
             input_statement = bot.input.process_input_statement(comment)
             statement, response = bot.generate_response(input_statement, session_id)
@@ -572,7 +563,6 @@ def hipchat_bot():
 
     while True:
         try:
-
             response = bot.get_response(None)
 
         except (KeyboardInterrupt, EOFError, SystemExit):
@@ -604,7 +594,6 @@ def gitter_bot():
 
     while True:
         try:
-
             response = bot.get_response(None)
 
         except (KeyboardInterrupt, EOFError, SystemExit):
@@ -631,7 +620,6 @@ def voice_bot():
 
     while True:
         try:
-
             bot_input = bot.get_response(None)
 
         # Press ctrl-c or ctrl-d on the keyboard to exit
@@ -662,45 +650,17 @@ def bot_sploit():
     return
 
 
-# def export(filename=None):
-#     """
-#     * export the database
-#     * mongoexport -d bot_db -c statements
-#     """
-#     # return filename
-#     # from os.path import join
-#     import pymongo
-#     # from bson.json_utils import dumps
-#     username = 'root'
-#     password = 'root'
-#     host = 'mongodb://{}:{}@127.0.0.1'.format(username, password)
-#     port = 27017
-#     database = 'bot_db'
-#
-#     def backup_db(backup_db_dir):
-#         """
-#         backup mongo db
-#         """
-#         pass
-#         # client = pymongo.MongoClient(host=host, port=port)
-#         # database = client['bot_db']
-#         # print(authenticated = database.authenticate())
-#         # assert authenticated, "Could not authenticate to database!"
-#         # print(collections)
-#         # collections = database.collection_names()
-#         # for i, collection_name in enumerate(collections):
-#             # col = getattr(database,collections[i])
-#             # collection = col.find()
-#             # jsonpath = collection_name + ".json"
-#             # jsonpath = join(backup_db_dir, jsonpath)
-#             # with open(jsonpath, 'wb') as jsonfile:
-#                 # jsonfile.write(dumps(collection))
-#     # bot = chat_bot()
-#     # backup_db(backup_db_dir=os.environ['PWD'])
-#     # if filename == None:
-#         # export = 'export.yml'
-#     # else:
-#         # backup_db(backup_db_dir=os.environ['PWD'])
+def export():
+    """
+    * export the database
+    * mongoexport -d bot_db -c statements
+    """
+
+
+def backup_db():
+    """
+    backup mongo db
+    """
 
 
 def emoji_preprocessor(bot, statement):
@@ -788,7 +748,6 @@ def twitter_bot():
                     return True
 
                 else:
-
                     if int(api.me().id) != int(sender_id):
                         input_statement = self.bot.input.process_input_statement(
                             comment
@@ -843,7 +802,7 @@ def twitter_bot():
         * limit how many
         """
         search_results = twitter_search(search, 3)
-        for tweet in search_resulsts:
+        for tweet in search_results:
             try:
                 tweet.retweet()
             except tweepy.TweepError as e:
@@ -945,7 +904,6 @@ def main():
 
 
 if __name__ == "__main__":
-
     LOG = logging_setup()
 
     main()
