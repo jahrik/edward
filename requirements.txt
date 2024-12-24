@@ -10,7 +10,7 @@ oauthlib==3.0.1
 Pint==0.9
 praw==6.1.1
 prawcore==1.0.1
-pymongo==3.7.2
+pymongo==4.6.3
 PySocks==1.6.8
 python-dateutil==2.7.5
 pytz==2018.9
