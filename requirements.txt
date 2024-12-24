@@ -3,7 +3,7 @@ chardet==3.0.4
 ChatterBot==1.0.3
 chatterbot-corpus==1.2.0
 docopt==0.6.2
-idna==2.8
+idna==3.7
 mathparse==0.1.2
 nltk==3.6.6
 oauthlib==3.0.1
