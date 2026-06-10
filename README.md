@@ -1,6 +1,8 @@
 # Edward
 
-[![Join the chat at https://gitter.im/jahrik/edward](https://badges.gitter.im/jahrik/edward.svg)](https://gitter.im/jahrik/edward?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![CI](https://github.com/jahrik/edward/actions/workflows/ci.yml/badge.svg)](https://github.com/jahrik/edward/actions/workflows/ci.yml)
+
+> **Frozen learning archive (built ~2019).** The services and libraries this bot was wired to are gone: ChatterBot is unmaintained, tweepy 3.x's `StreamListener` died with the old Twitter streaming API, and Gitter, HipChat, and the facepy Facebook Graph integration have all shut down or changed beyond recognition. The pinned `requirements.txt` no longer installs on a current Python. The code is kept compiling and lint-clean as reference material.
 
 * A small bot that utilizes praw and chatterbot to connect to multiple services
 * chatterbot: https://github.com/gunthercox/ChatterBot

@@ -563,7 +563,7 @@ def hipchat_bot():
 
     while True:
         try:
-            response = bot.get_response(None)
+            bot.get_response(None)
 
         except (KeyboardInterrupt, EOFError, SystemExit):
             break
@@ -594,7 +594,7 @@ def gitter_bot():
 
     while True:
         try:
-            response = bot.get_response(None)
+            bot.get_response(None)
 
         except (KeyboardInterrupt, EOFError, SystemExit):
             break
@@ -620,7 +620,7 @@ def voice_bot():
 
     while True:
         try:
-            bot_input = bot.get_response(None)
+            bot.get_response(None)
 
         # Press ctrl-c or ctrl-d on the keyboard to exit
         except (KeyboardInterrupt, EOFError, SystemExit):
