@@ -72,18 +72,18 @@ def counts():
     posts= "no likes"
     client = MongoClient()
     db = client.fb
-    collection = db.check
+    _collection = db.check
     query = db.posts.find()
     for q in query:
             liker_id = "null"
-            liker_name = "null"
-            likes = "no likes in the post"
+            _liker_name = "null"
+            _likes = "no likes in the post"
             id = q['post_id']
             response=graph.get(id+'?fields=likes.summary(true),comments.summary(true),shares')
             if 'likes' in response:
                 for d in response['likes']['data']:
                      liker_id = d['id']
-                     liker_name = d['name']
+                     _liker_name = d['name']
                      for i in liker_id:
                           posts = {"id":[liker_id]}
                 post = {"post_id":id,"likes":posts}
