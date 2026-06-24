@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 export.json
 venv/
+*.db
