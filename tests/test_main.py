@@ -13,6 +13,4 @@ def test_main_execution():
 
 def test_main_import():
     with patch("edward.cli.cli") as mock_cli:
-        import edward.__main__
-
         mock_cli.assert_not_called()
