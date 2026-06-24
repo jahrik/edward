@@ -19,7 +19,4 @@ python3 -m py_compile $(git ls-files '*.py')   # syntax check
 
 - `src/edward/` — modern modular package with a `click` CLI entry point. Core (`src/edward/core/`) integrates `aiosqlite` for local Conversation RAG Memory and `ollama` for LLM interactions (`OLLAMA_HOST` defaults to `http://localhost:11434`).
 - `edward.py` — original 2019 script with docopt CLI, training modes, etc. (kept untouched for historical archive purposes)
-- `face_bot.py` — separate facepy/Facebook Graph experiment, partially commented out
-- `mongo_functions.py` — mongo export helpers with hardcoded root/root localhost creds (archive artifact)
-- The Dockerfile (`python:3.7.0a1-stretch` alpha base) and compose/stack files match the 2019 stack and are kept as-is for reference
-- `list_5000` is training word-list data
+- Docker Swarm deployment is configured via `docker-stack.yml` and the modern multi-arch `Dockerfile` utilizing a `uv` base.

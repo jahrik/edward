@@ -89,7 +89,7 @@ GitHub Actions automatically gates PRs against the test suite and builds the mul
 
 ## History & Legacy
 
-The original `edward.py`, `face_bot.py`, and `mongo_functions.py` scripts remain in the root directory completely untouched. They serve as a frozen learning archive of the 2019 ChatBot era.
+The original `edward.py` script remains in the root directory completely untouched. It serves as a frozen learning archive of the 2019 ChatBot era.
 
 ## License
 
