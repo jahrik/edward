@@ -69,9 +69,11 @@ async def init_db(db_path: Optional[str] = None) -> None:
 
 
 async def store_message(role: str, content: str) -> None:
-    """Store a message in the database."""
+    """Store a message in the conversation history."""
     if _CONN is None:
         await init_db()
+
+    assert _CONN is not None
 
     await _CONN.execute(
         "INSERT INTO messages (role, content) VALUES (?, ?)",
@@ -81,11 +83,13 @@ async def store_message(role: str, content: str) -> None:
 
 
 async def get_context(
-    query: Optional[str] = None, limit: int = 10
+    limit: int = 10, query: Optional[str] = None
 ) -> List[Dict[str, str]]:
-    """Retrieve the most recent messages."""
+    """Get the most recent conversation history, or relevant context if query is provided."""
     if _CONN is None:
         await init_db()
+
+    assert _CONN is not None
 
     if query:
         fts_query = _build_fts_query(query)

@@ -1,4 +1,4 @@
-from aioconsole import ainput
+from aioconsole import ainput  # type: ignore[import-untyped]
 
 from edward.core import llm, memory
 from edward.core.config import settings
