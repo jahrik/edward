@@ -1,3 +1,4 @@
+import json
 import os
 import re
 from typing import Dict, List, Optional
@@ -114,6 +115,16 @@ async def get_context(
         messages.reverse()
 
     return messages
+
+
+async def export_history(filepath: str = "edward_export.json") -> None:
+    """Export the conversation history to a JSON file."""
+    if _CONN is None:
+        await init_db()
+
+    all_history = await get_context(limit=10000)
+    with open(filepath, "w") as f:
+        json.dump(all_history, f, indent=2)
 
 
 async def close_db() -> None:

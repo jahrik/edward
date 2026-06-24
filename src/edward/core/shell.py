@@ -1,4 +1,3 @@
-import json
 from aioconsole import ainput
 
 from edward.core import llm, memory
@@ -23,9 +22,7 @@ async def run_shell_loop(model: str | None = None) -> None:
 
         if text.lower() == "/export":
             print("Edward: Exporting history to edward_export.json...")
-            all_history = await memory.get_context(limit=1000)
-            with open("edward_export.json", "w") as f:
-                json.dump(all_history, f, indent=2)
+            await memory.export_history()
             print("Edward: Export complete.")
             continue
 

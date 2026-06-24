@@ -26,5 +26,16 @@ def cli():
 @coro
 async def start():
     """Starts the Edward event loop."""
-    # This will hook into Phase 3's shell/chat loop
     await run_bot()
+
+
+@cli.command()
+@coro
+async def export():
+    """Export the Edward conversation history to JSON."""
+    from edward.core import memory
+
+    print("Exporting history to edward_export.json...")
+    await memory.export_history()
+    print("Export complete.")
+    await memory.close_db()

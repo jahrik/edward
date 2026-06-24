@@ -104,20 +104,18 @@ async def test_run_shell_loop_interaction(mocker):
 
 @pytest.mark.asyncio
 async def test_run_shell_loop_export(mocker, tmp_path):
-    mocker.patch("builtins.open", mocker.mock_open())
     inputs = ["/export", "/exit"]
     mock_ainput = AsyncMock(side_effect=inputs)
     mocker.patch("edward.core.shell.ainput", new=mock_ainput)
-    mock_get_context = mocker.patch(
-        "edward.core.shell.memory.get_context",
+    mock_export = mocker.patch(
+        "edward.core.shell.memory.export_history",
         new_callable=AsyncMock,
-        return_value=[{"role": "user", "content": "hello"}],
     )
     mock_print = mocker.patch("builtins.print")
 
     await run_shell_loop()
 
-    mock_get_context.assert_called_once_with(limit=1000)
+    mock_export.assert_called_once()
     mock_print.assert_any_call("Edward: Exporting history to edward_export.json...")
     mock_print.assert_any_call("Edward: Export complete.")
 

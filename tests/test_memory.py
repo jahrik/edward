@@ -1,10 +1,17 @@
 import os
 import tempfile
+from unittest.mock import AsyncMock
 
 import pytest
 import pytest_asyncio
 
-from edward.core.memory import close_db, get_context, init_db, store_message
+from edward.core.memory import (
+    close_db,
+    get_context,
+    init_db,
+    store_message,
+    export_history,
+)
 
 
 @pytest_asyncio.fixture
@@ -77,3 +84,33 @@ async def test_auto_init(mocker):
 
     await close_db()
     os.remove(path)
+
+
+@pytest.mark.asyncio
+async def test_export_history(mocker, temp_db, tmp_path):
+    await store_message("user", "test export")
+
+    export_file = tmp_path / "test_export.json"
+    await export_history(str(export_file))
+
+    import json
+
+    with open(export_file) as f:
+        data = json.load(f)
+
+    assert len(data) == 1
+    assert data[0]["content"] == "test export"
+
+
+@pytest.mark.asyncio
+async def test_export_history_uninitialized(mocker, tmp_path):
+    mocker.patch("edward.core.memory._CONN", None)
+    mock_init = mocker.patch("edward.core.memory.init_db", new_callable=AsyncMock)
+    mocker.patch(
+        "edward.core.memory.get_context", new_callable=AsyncMock, return_value=[]
+    )
+
+    export_file = tmp_path / "test_uninit_export.json"
+    await export_history(str(export_file))
+
+    mock_init.assert_called_once()
