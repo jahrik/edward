@@ -6,18 +6,13 @@ from ollama import AsyncClient
 from edward.core.llm import generate_response, get_llm_client
 
 
-def test_get_llm_client(mocker):
+@pytest.mark.parametrize("env_dict", [{"OLLAMA_HOST": "http://test-host:11434"}, {}])
+def test_get_llm_client(mocker, env_dict):
     mocker.patch("edward.core.llm._CLIENT", None)
-    mocker.patch.dict(os.environ, {"OLLAMA_HOST": "http://test-host:11434"})
-    client = get_llm_client()
-    assert isinstance(client, AsyncClient)
-    # The internal host might be formatted slightly differently but we verify it's an AsyncClient
-
-
-def test_get_llm_client_default(mocker):
-    mocker.patch("edward.core.llm._CLIENT", None)
-    if "OLLAMA_HOST" in os.environ:
+    if not env_dict and "OLLAMA_HOST" in os.environ:
         mocker.patch.dict(os.environ, {}, clear=True)
+    else:
+        mocker.patch.dict(os.environ, env_dict)
     client = get_llm_client()
     assert isinstance(client, AsyncClient)
 

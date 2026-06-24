@@ -5,40 +5,20 @@ import pytest
 from edward.core.shell import run_shell_loop
 
 
+@pytest.mark.parametrize("exit_input", ["/quit", "/exit", None])
 @pytest.mark.asyncio
-async def test_run_shell_loop_quit(mocker):
-    # Mock ainput to return "/quit"
+async def test_run_shell_loop_termination_inputs(mocker, exit_input):
     mocker.patch(
-        "edward.core.shell.ainput", new_callable=AsyncMock, return_value="/quit"
+        "edward.core.shell.ainput", new_callable=AsyncMock, return_value=exit_input
     )
-
     await run_shell_loop()
 
 
+@pytest.mark.parametrize("exception", [EOFError, KeyboardInterrupt])
 @pytest.mark.asyncio
-async def test_run_shell_loop_exit(mocker):
-    # Mock ainput to return "/exit"
-    mocker.patch(
-        "edward.core.shell.ainput", new_callable=AsyncMock, return_value="/exit"
-    )
-
-    await run_shell_loop()
-
-
-@pytest.mark.asyncio
-async def test_run_shell_loop_eof(mocker):
-    # Mock ainput to return None to simulate EOF logic from aioconsole depending on setup
-    mocker.patch("edward.core.shell.ainput", new_callable=AsyncMock, return_value=None)
-
-    await run_shell_loop()
-
-
-@pytest.mark.asyncio
-async def test_run_shell_loop_eoferror(mocker):
-    # Mock ainput to raise EOFError
-    mock_ainput = AsyncMock(side_effect=EOFError)
+async def test_run_shell_loop_interrupts(mocker, exception):
+    mock_ainput = AsyncMock(side_effect=exception)
     mocker.patch("edward.core.shell.ainput", new=mock_ainput)
-
     await run_shell_loop()
 
 
@@ -54,7 +34,14 @@ async def test_run_shell_loop_interaction(mocker):
         "edward.core.shell.memory.store_message", new_callable=AsyncMock
     )
     mock_get_context = mocker.patch(
-        "edward.core.shell.memory.get_context", new_callable=AsyncMock, return_value=[]
+        "edward.core.shell.memory.get_context",
+        new_callable=AsyncMock,
+        side_effect=[
+            [{"role": "user", "content": "recent"}],  # First call: limit=10
+            [
+                {"role": "assistant", "content": "rag memory"}
+            ],  # Second call: query="hello"
+        ],
     )
     mock_generate = mocker.patch(
         "edward.core.shell.llm.generate_response",
@@ -75,22 +62,65 @@ async def test_run_shell_loop_interaction(mocker):
     assert mock_store.call_count == 2
 
     # Check context retrieval
-    mock_get_context.assert_called_once_with(limit=10)
+    assert mock_get_context.call_count == 2
+    mock_get_context.assert_any_call(limit=10)
+    mock_get_context.assert_any_call(query="hello", limit=3)
 
-    # Check LLM call
-    mock_generate.assert_called_once_with(messages=[], model="llama3.2:1b")
+    # Check LLM call includes the system RAG prompt
+    from edward.core.config import settings
+
+    expected_messages = [
+        {
+            "role": "system",
+            "content": f"{settings.system_prompt}\n\nRelevant past conversation memory:\n[assistant] rag memory",
+        },
+        {"role": "user", "content": "recent"},
+    ]
+    mock_generate.assert_called_once_with(
+        messages=expected_messages, model="llama3.2:1b"
+    )
 
     # Check print
     mock_print.assert_called_once_with("Edward: Hi there!")
 
 
 @pytest.mark.asyncio
-async def test_run_shell_loop_keyboardinterrupt(mocker):
-    # Mock ainput to raise KeyboardInterrupt
-    mock_ainput = AsyncMock(side_effect=KeyboardInterrupt)
+async def test_run_shell_loop_export(mocker, tmp_path):
+    inputs = ["/export", "/exit"]
+    mock_ainput = AsyncMock(side_effect=inputs)
     mocker.patch("edward.core.shell.ainput", new=mock_ainput)
+    mock_export = mocker.patch(
+        "edward.core.shell.memory.export_history",
+        new_callable=AsyncMock,
+    )
+    mock_print = mocker.patch("builtins.print")
 
     await run_shell_loop()
+
+    mock_export.assert_called_once()
+    mock_print.assert_any_call("Edward: Exporting history to edward_export.json...")
+    mock_print.assert_any_call("Edward: Export complete.")
+
+
+@pytest.mark.asyncio
+async def test_run_shell_loop_empty_response(mocker):
+    inputs = ["hello", "/exit"]
+    mock_ainput = AsyncMock(side_effect=inputs)
+    mocker.patch("edward.core.shell.ainput", new=mock_ainput)
+    mocker.patch("edward.core.shell.memory.store_message", new_callable=AsyncMock)
+    mocker.patch(
+        "edward.core.shell.memory.get_context", new_callable=AsyncMock, return_value=[]
+    )
+    mocker.patch(
+        "edward.core.shell.llm.generate_response",
+        new_callable=AsyncMock,
+        return_value="  ",
+    )
+    mock_print = mocker.patch("builtins.print")
+
+    await run_shell_loop()
+
+    mock_print.assert_called_once_with("Edward: (Edward stares blankly)")
 
 
 @pytest.mark.asyncio

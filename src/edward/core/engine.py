@@ -14,7 +14,7 @@ async def run_bot():
 
         # 2. Setup Ollama client (Phase 2)
         print("Connecting to Ollama...")
-        llm_client = get_llm_client()  # noqa: F841
+        get_llm_client()
 
         # 3. Start interaction loop (Phase 3)
         await run_shell_loop()
