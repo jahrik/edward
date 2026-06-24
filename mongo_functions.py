@@ -2,6 +2,7 @@
 """
 Manage mongo db
 """
+
 # import edward
 import os
 import pymongo
@@ -15,9 +16,9 @@ def export(filename=None):
     # return filename
     # from os.path import join
     # from bson.json_utils import dumps
-    username = 'root'
-    password = 'root'
-    host = 'mongodb://{}:{}@127.0.0.1'.format(username, password)
+    username = "root"
+    password = "root"
+    host = "mongodb://{}:{}@127.0.0.1".format(username, password)
     port = 27017
     # database = 'bot_db'
 
@@ -26,17 +27,17 @@ def export(filename=None):
         backup database
         """
         if filename is None:
-            filename = 'export.yml'
+            filename = "export.yml"
         else:
             filename = filename
 
         if backup_db_dir is None:
-            backup_db_dir = os.environ['PWD']
+            backup_db_dir = os.environ["PWD"]
         else:
             backup_db_dir = backup_db_dir
 
         client = pymongo.MongoClient(host=host, port=port)
-        database = client['bot_db']
+        database = client["bot_db"]
         print(authenticated=database.authenticate())
         # assert authenticated, "Could not authenticate to database!"
         collections = database.collection_names()
@@ -48,8 +49,9 @@ def export(filename=None):
         # jsonpath = join(backup_db_dir, jsonpath)
         # with open(jsonpath, 'wb') as jsonfile:
         # jsonfile.write(dumps(collection))
+
     # bot = chat_bot()
-    backup_db(backup_db_dir=os.environ['PWD'], filename=filename)
+    backup_db(backup_db_dir=os.environ["PWD"], filename=filename)
 
 
 # ex
