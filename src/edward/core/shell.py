@@ -22,10 +22,30 @@ async def run_shell_loop(model: str = "llama3.2:1b") -> None:
             continue
 
         await memory.store_message("user", text)
-        context = await memory.get_context(limit=10)
+
+        # Get recent sequential history
+        recent_context = await memory.get_context(limit=10)
+
+        # Get RAG context based on current query
+        rag_context = await memory.get_context(query=text, limit=3)
+
+        # Filter RAG to avoid duplicating what's already in recent history
+        recent_contents = {msg["content"] for msg in recent_context}
+        unique_rag = [
+            msg for msg in rag_context if msg["content"] not in recent_contents
+        ]
+
+        final_context = []
+        if unique_rag:
+            rag_text = "Relevant past conversation memory:\n" + "\n".join(
+                f"[{msg['role']}] {msg['content']}" for msg in unique_rag
+            )
+            final_context.append({"role": "system", "content": rag_text})
+
+        final_context.extend(recent_context)
 
         try:
-            response = await llm.generate_response(messages=context, model=model)
+            response = await llm.generate_response(messages=final_context, model=model)
         except Exception as e:
             print(f"Edward: Error connecting to LLM ({e})")
             continue

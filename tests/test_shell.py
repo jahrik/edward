@@ -75,8 +75,9 @@ async def test_run_shell_loop_interaction(mocker):
     assert mock_store.call_count == 2
 
     # Check context retrieval
-    mock_get_context.assert_called_once_with(limit=10)
-
+    assert mock_get_context.call_count == 2
+    mock_get_context.assert_any_call(limit=10)
+    mock_get_context.assert_any_call(query="hello", limit=3)
     # Check LLM call
     mock_generate.assert_called_once_with(messages=[], model="llama3.2:1b")
 

@@ -1,9 +1,18 @@
+import re
 from typing import Dict, List, Optional
 
 import aiosqlite
 
 DB_PATH = "edward_memory.db"
 _CONN: Optional[aiosqlite.Connection] = None
+
+
+def _build_fts_query(query: str) -> str:
+    """Sanitize and build an FTS5 MATCH query string."""
+    words = re.findall(r"\w+", query)
+    if not words:
+        return '""'
+    return " OR ".join(words)
 
 
 async def init_db(db_path: Optional[str] = None) -> None:
@@ -25,6 +34,30 @@ async def init_db(db_path: Optional[str] = None) -> None:
         )
         """
     )
+
+    # FTS5 Virtual Table for true RAG
+    await _CONN.execute(
+        """
+        CREATE VIRTUAL TABLE IF NOT EXISTS messages_fts USING fts5(
+            content,
+            content='messages',
+            content_rowid='id'
+        )
+        """
+    )
+
+    # Triggers to keep FTS table in sync
+    await _CONN.execute(
+        """
+        CREATE TRIGGER IF NOT EXISTS messages_ai AFTER INSERT ON messages BEGIN
+            INSERT INTO messages_fts(rowid, content) VALUES (new.id, new.content);
+        END;
+        """
+    )
+
+    # Safely rebuild the index for any pre-existing records before FTS5 was added
+    await _CONN.execute("INSERT INTO messages_fts(messages_fts) VALUES('rebuild')")
+
     await _CONN.commit()
 
 
@@ -47,22 +80,33 @@ async def get_context(
     if _CONN is None:
         await init_db()
 
-    sql = "SELECT role, content FROM messages"
-    params = []
-
     if query:
-        sql += " WHERE content LIKE ?"
-        params.append(f"%{query}%")
+        fts_query = _build_fts_query(query)
+        if fts_query == '""':
+            return []
 
-    sql += " ORDER BY timestamp DESC, id DESC LIMIT ?"
-    params.append(limit)
+        sql = """
+            SELECT m.role, m.content 
+            FROM messages m
+            JOIN messages_fts fts ON m.id = fts.rowid
+            WHERE messages_fts MATCH ?
+            ORDER BY fts.rank
+            LIMIT ?
+        """
+        params = [fts_query, limit]
+    else:
+        sql = "SELECT role, content FROM messages ORDER BY timestamp DESC, id DESC LIMIT ?"
+        params = [limit]
 
     cursor = await _CONN.execute(sql, tuple(params))
     rows = await cursor.fetchall()
 
-    # Reverse to get chronological order for context
     messages = [{"role": row[0], "content": row[1]} for row in rows]
-    messages.reverse()
+
+    # Reverse only if getting sequential recent history
+    if not query:
+        messages.reverse()
+
     return messages
 
 

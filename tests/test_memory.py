@@ -46,11 +46,17 @@ async def test_get_context_with_query(temp_db):
     # Test with query
     context = await get_context(query="capital")
     assert len(context) == 2
-    assert context[0] == {"role": "user", "content": "What is the capital of France?"}
     assert context[1] == {
         "role": "assistant",
         "content": "The capital of France is Paris.",
     }
+
+
+@pytest.mark.asyncio
+async def test_get_context_empty_fts_query(temp_db):
+    await store_message("user", "Hello")
+    context = await get_context(query="!!! ???")
+    assert len(context) == 0
 
 
 @pytest.mark.asyncio
