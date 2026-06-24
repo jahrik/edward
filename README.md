@@ -87,10 +87,6 @@ uv run pytest --cov=src/edward --cov-report=term-missing
 
 GitHub Actions automatically gates PRs against the test suite and builds the multi-arch image on push to `master`.
 
-## History & Legacy
-
-The original `edward.py` script remains in the root directory completely untouched. It serves as a frozen learning archive of the 2019 ChatBot era.
-
 ## License
 
 GPLv2
