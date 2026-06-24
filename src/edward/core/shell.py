@@ -1,3 +1,4 @@
+import json
 from aioconsole import ainput
 
 from edward.core import llm, memory
@@ -17,6 +18,14 @@ async def run_shell_loop(model: str = "llama3.2:1b") -> None:
         text = user_input.strip()
         if text.lower() in ("/quit", "/exit"):
             break
+
+        if text.lower() == "/export":
+            print("Edward: Exporting history to edward_export.json...")
+            all_history = await memory.get_context(limit=1000)
+            with open("edward_export.json", "w") as f:
+                json.dump(all_history, f, indent=2)
+            print("Edward: Export complete.")
+            continue
 
         if not text:
             continue
@@ -49,6 +58,9 @@ async def run_shell_loop(model: str = "llama3.2:1b") -> None:
         except Exception as e:
             print(f"Edward: Error connecting to LLM ({e})")
             continue
+
+        if not response or not response.strip():
+            response = "(Edward stares blankly)"
 
         print(f"Edward: {response}")
 

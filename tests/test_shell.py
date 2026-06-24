@@ -54,7 +54,14 @@ async def test_run_shell_loop_interaction(mocker):
         "edward.core.shell.memory.store_message", new_callable=AsyncMock
     )
     mock_get_context = mocker.patch(
-        "edward.core.shell.memory.get_context", new_callable=AsyncMock, return_value=[]
+        "edward.core.shell.memory.get_context",
+        new_callable=AsyncMock,
+        side_effect=[
+            [{"role": "user", "content": "recent"}],  # First call: limit=10
+            [
+                {"role": "assistant", "content": "rag memory"}
+            ],  # Second call: query="hello"
+        ],
     )
     mock_generate = mocker.patch(
         "edward.core.shell.llm.generate_response",
@@ -78,11 +85,62 @@ async def test_run_shell_loop_interaction(mocker):
     assert mock_get_context.call_count == 2
     mock_get_context.assert_any_call(limit=10)
     mock_get_context.assert_any_call(query="hello", limit=3)
-    # Check LLM call
-    mock_generate.assert_called_once_with(messages=[], model="llama3.2:1b")
+
+    # Check LLM call includes the system RAG prompt
+    expected_messages = [
+        {
+            "role": "system",
+            "content": "Relevant past conversation memory:\n[assistant] rag memory",
+        },
+        {"role": "user", "content": "recent"},
+    ]
+    mock_generate.assert_called_once_with(
+        messages=expected_messages, model="llama3.2:1b"
+    )
 
     # Check print
     mock_print.assert_called_once_with("Edward: Hi there!")
+
+
+@pytest.mark.asyncio
+async def test_run_shell_loop_export(mocker, tmp_path):
+    mocker.patch("builtins.open", mocker.mock_open())
+    inputs = ["/export", "/exit"]
+    mock_ainput = AsyncMock(side_effect=inputs)
+    mocker.patch("edward.core.shell.ainput", new=mock_ainput)
+    mock_get_context = mocker.patch(
+        "edward.core.shell.memory.get_context",
+        new_callable=AsyncMock,
+        return_value=[{"role": "user", "content": "hello"}],
+    )
+    mock_print = mocker.patch("builtins.print")
+
+    await run_shell_loop()
+
+    mock_get_context.assert_called_once_with(limit=1000)
+    mock_print.assert_any_call("Edward: Exporting history to edward_export.json...")
+    mock_print.assert_any_call("Edward: Export complete.")
+
+
+@pytest.mark.asyncio
+async def test_run_shell_loop_empty_response(mocker):
+    inputs = ["hello", "/exit"]
+    mock_ainput = AsyncMock(side_effect=inputs)
+    mocker.patch("edward.core.shell.ainput", new=mock_ainput)
+    mocker.patch("edward.core.shell.memory.store_message", new_callable=AsyncMock)
+    mocker.patch(
+        "edward.core.shell.memory.get_context", new_callable=AsyncMock, return_value=[]
+    )
+    mocker.patch(
+        "edward.core.shell.llm.generate_response",
+        new_callable=AsyncMock,
+        return_value="  ",
+    )
+    mock_print = mocker.patch("builtins.print")
+
+    await run_shell_loop()
+
+    mock_print.assert_called_once_with("Edward: (Edward stares blankly)")
 
 
 @pytest.mark.asyncio
