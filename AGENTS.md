@@ -4,7 +4,7 @@ This file provides guidance to AI coding agents when working with code in this r
 
 ## Purpose
 
-"Edward" — a ~2019 chatbot that trained ChatterBot from Reddit (praw) and Twitter (tweepy) data stored in MongoDB, and chatted on Gitter/HipChat/voice. **Frozen learning archive**: ChatterBot is unmaintained, the Twitter streaming API and tweepy 3.x `StreamListener` are gone, Gitter/HipChat are dead, and the pinned requirements don't install on a current Python. The maintained bar is "compiles on current Python 3 and lints clean" — do not resurrect dependencies or port to new APIs unless explicitly asked.
+"Edward" is an asynchronous chatbot built with Python. Originally created in 2019, Edward has been fully modernized to utilize **Ollama** for blazing fast, local LLM inference and **SQLite** for persistent, Retrieval-Augmented Generation (RAG) conversation memory. The codebase relies on a modern `uv` stack, `asyncio`, and `click` for the CLI.
 
 ## Commands
 
