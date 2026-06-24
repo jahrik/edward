@@ -9,15 +9,17 @@ This file provides guidance to AI coding agents when working with code in this r
 ## Commands
 
 ```bash
+uv run edward start                            # start the bot
+uv run edward --help                           # see available commands
 ruff check .                                   # lint; config in pyproject.toml, CI runs the same
 python3 -m py_compile $(git ls-files '*.py')   # syntax check
 ```
 
 ## Layout & quirks
 
-- `edward.py` — everything: docopt CLI, training modes (`-t english|reddit|twitter|ubuntu`), bot runners (`-b gitter|hipchat|voice|feedback`); storage is ChatterBot's `MongoDatabaseAdapter` against `mongodb://mongo:27017/`
+- `src/edward/` — modern modular package with a `click` CLI entry point
+- `edward.py` — original 2019 script with docopt CLI, training modes, etc. (kept untouched for historical archive purposes)
 - `face_bot.py` — separate facepy/Facebook Graph experiment, partially commented out
 - `mongo_functions.py` — mongo export helpers with hardcoded root/root localhost creds (archive artifact)
-- `README.md` is partly generated from docstrings by `docs.sh` (`make docs` regenerates and pushes) — edit docstrings, not the Module defs section
 - The Dockerfile (`python:3.7.0a1-stretch` alpha base) and compose/stack files match the 2019 stack and are kept as-is for reference
 - `list_5000` is training word-list data
