@@ -19,3 +19,4 @@ jobs:
           python-version: '3.12'
       - run: uvx ruff check .
       - run: uv run python -m py_compile $(git ls-files '*.py')
+      - run: uv run pytest --cov=src/edward
