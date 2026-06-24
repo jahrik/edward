@@ -3,7 +3,7 @@ from aioconsole import ainput
 from edward.core import llm, memory
 
 
-async def run_shell_loop(model: str = "llama3") -> None:
+async def run_shell_loop(model: str = "llama3.2:1b") -> None:
     """Run the interactive shell loop."""
     while True:
         try:

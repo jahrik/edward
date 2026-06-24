@@ -78,7 +78,7 @@ async def test_run_shell_loop_interaction(mocker):
     mock_get_context.assert_called_once_with(limit=10)
 
     # Check LLM call
-    mock_generate.assert_called_once_with(messages=[], model="llama3")
+    mock_generate.assert_called_once_with(messages=[], model="llama3.2:1b")
 
     # Check print
     mock_print.assert_called_once_with("Edward: Hi there!")
