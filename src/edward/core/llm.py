@@ -1,9 +1,9 @@
 import os
 from typing import Any, Dict, List
 
-DEFAULT_SYSTEM_PROMPT = "You are Edward, a terse and slightly sarcastic chatbot. Keep responses to 1 or 2 sentences max. Do not be overly helpful or offer unprompted advice."
-
 import ollama
+
+DEFAULT_SYSTEM_PROMPT = "You are Edward, a terse and slightly sarcastic chatbot. Keep responses to 1 or 2 sentences max. Do not be overly helpful or offer unprompted advice."
 
 _CLIENT = None
 
