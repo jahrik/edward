@@ -1,44 +1,10 @@
-version: '3'
+version: '3.8'
 
 services:
-
-  twitter_bot:
-    image: jahrik/bot:latest
+  edward:
+    image: ghcr.io/jahrik/edward:latest
     environment:
-      - TWITTER_KEY=${TWITTER_KEY}
-      - TWITTER_SECRET=${TWITTER_SECRET}
-      - TWITTER_TOKEN=${TWITTER_TOKEN}
-      - TWITTER_TOKEN_SECRET=${TWITTER_TOKEN_SECRET}
-    depends_on:
-      - mongo
-    command: python3 edward.py -b twitter
-
-  hipchat_bot:
-    image: jahrik/bot:latest
-    environment:
-      - HIPCHAT_HOST=${HIPCHAT_HOST}
-      - HIPCHAT_ROOM=${HIPCHAT_ROOM}
-      - HIPCHAT_ACCESS_TOKEN=${HIPCHAT_ACCESS_TOKEN}
-    depends_on:
-      - mongo
-    command: python3 edward.py -b hipchat
-
-  gitter_bot:
-    image: jahrik/bot:latest
-    environment:
-      - GITTER_ROOM=${GITTER_ROOM}
-      - GITTER_API_TOKEN=${GITTER_API_TOKEN}
-    depends_on:
-      - mongo
-    command: python3 edward.py -b gitter
-
-  mongo:
-    image: mongo:latest
-    environment:
-      - MONGO_DATA_DIR=/data/db
-      # - MONGO_LOG_DIR=/dev/null
+      - OLLAMA_HOST=http://ollama:11434
     volumes:
-      - ./data/db:/data/db
-    ports:
-      - 27017:27017
-    command: mongod
+      # Mount the local SQLite database into the container's working directory
+      - ./data/edward_memory.db:/app/edward_memory.db

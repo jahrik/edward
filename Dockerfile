@@ -1,31 +1,18 @@
-FROM python:3.7.0a1-stretch
-MAINTAINER jahrik <jahrik@gmail.com>
-ARG DEBIAN_FRONTEND=noninteractive
+# syntax=docker/dockerfile:1
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-RUN apt-get update
-# RUN apt-get install -y cron
+WORKDIR /app
 
-# RUN apt-get install -y jack
-# python3_pyaudio deps
-# RUN apt-get install -y \
-#       libasound-dev \
-#       portaudio19-dev \
-#       libportaudio2 \
-#       libportaudiocpp0 \
-#       ffmpeg \
-#       libav-tools 
-# 
-# RUN apt-get install -y python3-pyaudio
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
 
-# RUN service cron start
+# Install dependencies first (for caching)
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-install-project --no-dev
 
-WORKDIR /src
-COPY edward.py /src
-COPY requirements.txt /src
-# COPY config /src
-COPY Makefile /src
-# COPY crontab /etc/cron.d/bot_cron
+# Copy application source
+COPY . /app
+RUN uv sync --frozen --no-dev
 
-RUN pip install -r requirements.txt
-
-CMD ["python3","edward.py","-b","twitter"]
+# The application runs by default, using the uv-managed environment
+CMD ["uv", "run", "edward", "start"]
