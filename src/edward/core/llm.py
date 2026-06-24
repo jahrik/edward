@@ -22,7 +22,7 @@ async def generate_response(
 ) -> str:
     """Generate a response from the LLM based on the conversation history."""
     client = get_llm_client()
-    
+
     sys_prompt = os.environ.get("EDWARD_SYSTEM_PROMPT", DEFAULT_SYSTEM_PROMPT)
     full_messages = [{"role": "system", "content": sys_prompt}] + messages
 
