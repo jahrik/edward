@@ -2,10 +2,12 @@ import json
 from aioconsole import ainput
 
 from edward.core import llm, memory
+from edward.core.config import settings
 
 
-async def run_shell_loop(model: str = "llama3.2:1b") -> None:
+async def run_shell_loop(model: str | None = None) -> None:
     """Run the interactive shell loop."""
+    target_model = model or settings.model
     while True:
         try:
             user_input = await ainput("You: ")
@@ -54,7 +56,9 @@ async def run_shell_loop(model: str = "llama3.2:1b") -> None:
         final_context.extend(recent_context)
 
         try:
-            response = await llm.generate_response(messages=final_context, model=model)
+            response = await llm.generate_response(
+                messages=final_context, model=target_model
+            )
         except Exception as e:
             print(f"Edward: Error connecting to LLM ({e})")
             continue

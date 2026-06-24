@@ -1,9 +1,12 @@
+import os
 import re
 from typing import Dict, List, Optional
 
 import aiosqlite
 
-DB_PATH = "edward_memory.db"
+from edward.core.config import settings
+
+DB_PATH = settings.db_path
 _CONN: Optional[aiosqlite.Connection] = None
 
 
@@ -22,6 +25,9 @@ async def init_db(db_path: Optional[str] = None) -> None:
         DB_PATH = db_path
 
     if _CONN is None:
+        db_dir = os.path.dirname(DB_PATH)
+        if db_dir:
+            os.makedirs(db_dir, exist_ok=True)
         _CONN = await aiosqlite.connect(DB_PATH)
 
     await _CONN.execute(
