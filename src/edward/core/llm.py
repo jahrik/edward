@@ -16,9 +16,17 @@ def get_llm_client() -> ollama.AsyncClient:
 
 
 async def generate_response(
-    messages: List[Dict[str, Any]], model: str = "llama3"
+    messages: List[Dict[str, Any]], model: str = "llama3.2:1b"
 ) -> str:
     """Generate a response from the LLM based on the conversation history."""
     client = get_llm_client()
-    response = await client.chat(model=model, messages=messages)
+    try:
+        response = await client.chat(model=model, messages=messages)
+    except ollama.ResponseError as e:
+        if e.status_code == 404:
+            print(f"\nEdward: Downloading model {model}... this may take a moment.")
+            await client.pull(model)
+            response = await client.chat(model=model, messages=messages)
+        else:
+            raise
     return response["message"]["content"]
