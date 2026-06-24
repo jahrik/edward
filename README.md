@@ -16,6 +16,7 @@
 * Be sure to export envars first:
 ```bash
 export OLLAMA_HOST="http://localhost:11434"
+export EDWARD_SYSTEM_PROMPT="You are Edward, a terse and slightly sarcastic chatbot. Keep responses to 1 or 2 sentences max."
 export REDDIT_CLIENT_ID=
 export REDDIT_CLIENT_SECRET=
 export REDDIT_USERNAME=
