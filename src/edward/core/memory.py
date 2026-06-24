@@ -62,9 +62,6 @@ async def init_db(db_path: Optional[str] = None) -> None:
         """
     )
 
-    # Safely rebuild the index for any pre-existing records before FTS5 was added
-    await _CONN.execute("INSERT INTO messages_fts(messages_fts) VALUES('rebuild')")
-
     await _CONN.commit()
 
 

@@ -87,10 +87,12 @@ async def test_run_shell_loop_interaction(mocker):
     mock_get_context.assert_any_call(query="hello", limit=3)
 
     # Check LLM call includes the system RAG prompt
+    from edward.core.config import settings
+
     expected_messages = [
         {
             "role": "system",
-            "content": "Relevant past conversation memory:\n[assistant] rag memory",
+            "content": f"{settings.system_prompt}\n\nRelevant past conversation memory:\n[assistant] rag memory",
         },
         {"role": "user", "content": "recent"},
     ]

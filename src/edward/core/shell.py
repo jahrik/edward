@@ -44,12 +44,15 @@ async def run_shell_loop(model: str | None = None) -> None:
         ]
 
         final_context = []
+        system_text = settings.system_prompt
+
         if unique_rag:
             rag_text = "Relevant past conversation memory:\n" + "\n".join(
                 f"[{msg['role']}] {msg['content']}" for msg in unique_rag
             )
-            final_context.append({"role": "system", "content": rag_text})
+            system_text += "\n\n" + rag_text
 
+        final_context.append({"role": "system", "content": system_text})
         final_context.extend(recent_context)
 
         try:

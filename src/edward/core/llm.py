@@ -22,17 +22,15 @@ async def generate_response(
     client = get_llm_client()
     target_model = model or settings.model
 
-    full_messages = [{"role": "system", "content": settings.system_prompt}] + messages
-
     try:
-        response = await client.chat(model=target_model, messages=full_messages)
+        response = await client.chat(model=target_model, messages=messages)
     except ollama.ResponseError as e:
         if e.status_code == 404:
             print(
                 f"\nEdward: Downloading model {target_model}... this may take a moment."
             )
             await client.pull(target_model)
-            response = await client.chat(model=target_model, messages=full_messages)
+            response = await client.chat(model=target_model, messages=messages)
         else:
             raise
     return response["message"]["content"]
