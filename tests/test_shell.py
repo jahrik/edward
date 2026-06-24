@@ -5,40 +5,20 @@ import pytest
 from edward.core.shell import run_shell_loop
 
 
+@pytest.mark.parametrize("exit_input", ["/quit", "/exit", None])
 @pytest.mark.asyncio
-async def test_run_shell_loop_quit(mocker):
-    # Mock ainput to return "/quit"
+async def test_run_shell_loop_termination_inputs(mocker, exit_input):
     mocker.patch(
-        "edward.core.shell.ainput", new_callable=AsyncMock, return_value="/quit"
+        "edward.core.shell.ainput", new_callable=AsyncMock, return_value=exit_input
     )
-
     await run_shell_loop()
 
 
+@pytest.mark.parametrize("exception", [EOFError, KeyboardInterrupt])
 @pytest.mark.asyncio
-async def test_run_shell_loop_exit(mocker):
-    # Mock ainput to return "/exit"
-    mocker.patch(
-        "edward.core.shell.ainput", new_callable=AsyncMock, return_value="/exit"
-    )
-
-    await run_shell_loop()
-
-
-@pytest.mark.asyncio
-async def test_run_shell_loop_eof(mocker):
-    # Mock ainput to return None to simulate EOF logic from aioconsole depending on setup
-    mocker.patch("edward.core.shell.ainput", new_callable=AsyncMock, return_value=None)
-
-    await run_shell_loop()
-
-
-@pytest.mark.asyncio
-async def test_run_shell_loop_eoferror(mocker):
-    # Mock ainput to raise EOFError
-    mock_ainput = AsyncMock(side_effect=EOFError)
+async def test_run_shell_loop_interrupts(mocker, exception):
+    mock_ainput = AsyncMock(side_effect=exception)
     mocker.patch("edward.core.shell.ainput", new=mock_ainput)
-
     await run_shell_loop()
 
 
@@ -141,15 +121,6 @@ async def test_run_shell_loop_empty_response(mocker):
     await run_shell_loop()
 
     mock_print.assert_called_once_with("Edward: (Edward stares blankly)")
-
-
-@pytest.mark.asyncio
-async def test_run_shell_loop_keyboardinterrupt(mocker):
-    # Mock ainput to raise KeyboardInterrupt
-    mock_ainput = AsyncMock(side_effect=KeyboardInterrupt)
-    mocker.patch("edward.core.shell.ainput", new=mock_ainput)
-
-    await run_shell_loop()
 
 
 @pytest.mark.asyncio

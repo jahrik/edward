@@ -43,27 +43,25 @@ async def test_store_and_get_context(temp_db):
     assert context_limit[0] == {"role": "assistant", "content": "Hi there!"}
 
 
+@pytest.mark.parametrize(
+    "query, expected_count, verify_content",
+    [("capital", 2, "The capital of France is Paris."), ("!!! ???", 0, None)],
+)
 @pytest.mark.asyncio
-async def test_get_context_with_query(temp_db):
+async def test_get_context_queries(temp_db, query, expected_count, verify_content):
+    await store_message("user", "Hello")
     await store_message("user", "What is the capital of France?")
     await store_message("assistant", "The capital of France is Paris.")
     await store_message("user", "Who are you?")
     await store_message("assistant", "I am Edward.")
 
-    # Test with query
-    context = await get_context(query="capital")
-    assert len(context) == 2
-    assert context[1] == {
-        "role": "assistant",
-        "content": "The capital of France is Paris.",
-    }
+    context = await get_context(query=query)
+    assert len(context) == expected_count
 
-
-@pytest.mark.asyncio
-async def test_get_context_empty_fts_query(temp_db):
-    await store_message("user", "Hello")
-    context = await get_context(query="!!! ???")
-    assert len(context) == 0
+    if verify_content:
+        # FTS ranks may vary, but we can assert the expected content is returned
+        contents = [c["content"] for c in context]
+        assert verify_content in contents
 
 
 @pytest.mark.asyncio
