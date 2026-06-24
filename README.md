@@ -58,6 +58,18 @@ Special commands:
 - `/quit` or `/exit`: Shut down gracefully.
 - `/export`: Export your entire conversation history to `edward_export.json`.
 
+```bash
+# Start the bot
+uv run edward start
+
+# Start the bot with custom overrides
+uv run edward start --model llama3.2:3b --db-path my_custom_memory.db
+
+# Export the conversation history to JSON
+uv run edward export
+uv run edward export --output my_backup.json
+```
+
 For help and other commands:
 
 ```bash
