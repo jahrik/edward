@@ -89,7 +89,7 @@ GitHub Actions automatically gates PRs against the test suite and builds the mul
 
 ## License
 
-GPLv2
+MIT
 
 ## Author
 
