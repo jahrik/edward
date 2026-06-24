@@ -1,10 +1,11 @@
 [project]
 name = "edward"
 version = "0.1.0"
-description = "Add your description here"
+description = "Edward - Modernized Chatbot"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "click>=8.4.1",
     "docopt>=0.6.2",
     "praw>=8.0.2",
     "pymongo>=4.17.0",
@@ -17,3 +18,13 @@ dev = [
     "pytest>=9.1.1",
     "ruff>=0.15.19",
 ]
+
+[project.scripts]
+edward = "edward.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = true
