@@ -8,10 +8,14 @@
 * chatterbot: https://github.com/gunthercox/ChatterBot
 * PRAW: https://praw.readthedocs.io/en/latest/
 
+## Features
+* **Ollama**: Seamlessly connects to a local or centralized homelab instance (e.g., Llama 3.2 3B or 3.1 8B).
+* **Memory**: Uses a local SQLite database for Conversation RAG Memory.
+
 ## Dependencies
-* python 3.5+
 * Be sure to export envars first:
-```
+```bash
+export OLLAMA_HOST="http://localhost:11434"
 export REDDIT_CLIENT_ID=
 export REDDIT_CLIENT_SECRET=
 export REDDIT_USERNAME=
