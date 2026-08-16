@@ -7,10 +7,10 @@ import pytest_asyncio
 
 from edward.core.memory import (
     close_db,
+    export_history,
     get_context,
     init_db,
     store_message,
-    export_history,
 )
 
 
@@ -88,13 +88,13 @@ async def test_auto_init(mocker):
 async def test_export_history(mocker, temp_db, tmp_path):
     await store_message("user", "test export")
 
+    import asyncio
+    import json
+
     export_file = tmp_path / "test_export.json"
     await export_history(str(export_file))
 
-    import json
-
-    with open(export_file) as f:
-        data = json.load(f)
+    data = json.loads(await asyncio.to_thread(export_file.read_text))
 
     assert len(data) == 1
     assert data[0]["content"] == "test export"

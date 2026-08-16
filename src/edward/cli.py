@@ -19,7 +19,6 @@ def coro(f):
 @click.group()
 def cli():
     """Edward - Modernized Chatbot"""
-    pass
 
 
 @cli.command()

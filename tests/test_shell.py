@@ -1,5 +1,6 @@
 from unittest.mock import AsyncMock
 
+import httpx
 import pytest
 
 from edward.core.shell import run_shell_loop
@@ -142,7 +143,7 @@ async def test_run_shell_loop_llm_exception(mocker):
     mocker.patch(
         "edward.core.shell.llm.generate_response",
         new_callable=AsyncMock,
-        side_effect=Exception("Connection refused"),
+        side_effect=httpx.ConnectError("Connection refused"),
     )
 
     # Mock print
