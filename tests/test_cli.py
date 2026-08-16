@@ -1,6 +1,6 @@
-import pytest
 from unittest.mock import AsyncMock
 
+import pytest
 from click.testing import CliRunner
 
 from edward.cli import cli, coro

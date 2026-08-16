@@ -1,3 +1,5 @@
+import httpx
+import ollama
 from aioconsole import ainput  # type: ignore[import-untyped]
 
 from edward.core import llm, memory
@@ -59,7 +61,7 @@ async def run_shell_loop(model: str | None = None) -> None:
             response = await llm.generate_response(
                 messages=final_context, model=target_model
             )
-        except Exception as e:
+        except (ollama.ResponseError, httpx.RequestError) as e:
             print(f"Edward: Error connecting to LLM ({e})")
             continue
 

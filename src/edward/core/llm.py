@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 import ollama
 
@@ -16,7 +16,7 @@ def get_llm_client() -> ollama.AsyncClient:
 
 
 async def generate_response(
-    messages: List[Dict[str, Any]], model: str | None = None
+    messages: list[dict[str, Any]], model: str | None = None
 ) -> str:
     """Generate a response from the LLM based on the conversation history."""
     client = get_llm_client()

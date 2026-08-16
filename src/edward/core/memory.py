@@ -1,14 +1,14 @@
+import asyncio
 import json
 import os
 import re
-from typing import Dict, List, Optional
 
 import aiosqlite
 
 from edward.core.config import settings
 
 DB_PATH = settings.db_path
-_CONN: Optional[aiosqlite.Connection] = None
+_CONN: aiosqlite.Connection | None = None
 
 
 def _build_fts_query(query: str) -> str:
@@ -19,7 +19,7 @@ def _build_fts_query(query: str) -> str:
     return " OR ".join(words)
 
 
-async def init_db(db_path: Optional[str] = None) -> None:
+async def init_db(db_path: str | None = None) -> None:
     """Initialize the SQLite database with the messages table."""
     global DB_PATH, _CONN
     if db_path is not None:
@@ -80,8 +80,8 @@ async def store_message(role: str, content: str) -> None:
 
 
 async def get_context(
-    limit: int = 10, query: Optional[str] = None
-) -> List[Dict[str, str]]:
+    limit: int = 10, query: str | None = None
+) -> list[dict[str, str]]:
     """Get the most recent conversation history, or relevant context if query is provided."""
     if _CONN is None:
         await init_db()
@@ -118,14 +118,18 @@ async def get_context(
     return messages
 
 
+def _write_export(filepath: str, history: list[dict[str, str]]) -> None:
+    with open(filepath, "w") as f:
+        json.dump(history, f, indent=2)
+
+
 async def export_history(filepath: str = "edward_export.json") -> None:
     """Export the conversation history to a JSON file."""
     if _CONN is None:
         await init_db()
 
     all_history = await get_context(limit=10000)
-    with open(filepath, "w") as f:
-        json.dump(all_history, f, indent=2)
+    await asyncio.to_thread(_write_export, filepath, all_history)
 
 
 async def close_db() -> None:
